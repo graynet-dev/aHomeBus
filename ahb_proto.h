@@ -26,19 +26,23 @@
     #include <inttypes.h>
     
 //CMD IN ID   FRAME
+//NMT - управление сетью
     #define AHB_CMD_F_NMT_NULL                    0  //
     #define AHB_CMD_F_NMT_PING                    1  //
     #define AHB_CMD_F_NMT_PONG                    2  //
     #define AHB_CMD_F_NMT_ACCIDENT_SEND           4  //
-    #define AHB_CMD_F_NMT_ACCIDENT_ANSWER         5  //    
-      
+    #define AHB_CMD_F_NMT_ACCIDENT_ANSWER         5  //
+    #define AHB_CMD_F_NMT_HEARTBEAT               6  //
+    #define AHB_CMD_F_NMT_HEARTBEAT_TO_SLAVE      7
+    #define AHB_CMD_F_NMT_BOOT                    8  //
+//PDO - передача коротких сообщений за такт     
     #define AHB_CMD_F_PDO_CMD_SEND                16  //
     #define AHB_CMD_F_PDO_CMD_ANSWER              17  //
     
     #define AHB_CMD_F_PDO_DATA_REQUEST            32  //
     #define AHB_CMD_F_PDO_DATA_ANSWER             33  //
     #define AHB_CMD_F_PDO_DATA_RECIVE             34  //
-    
+//SDO - передача длинных сообщений за n тактов   
     #define AHB_CMD_F_SDO_SEND_TX_INIT_REQUEST    48  //
     #define AHB_CMD_F_SDO_SEND_TX_INIT_ANSWER     49  //
     #define AHB_CMD_F_SDO_SEND_TX_BEGIN           50  //
@@ -47,6 +51,8 @@
     #define AHB_CMD_F_SDO_SEND_TX_REPEAT          53  //
     #define AHB_CMD_F_SDO_ANSWER_TX_REPEAT_OK     53  //
     #define AHB_CMD_F_SDO_SEND_TX_BEGIN           55  //
+//SYNC - команда всем начать синхронизацию
+    #define AHB_CMD_F_SYNC_ALL                    64  //
     
 //CMD IN DATA FRAME
     //#define AHB_PKGTYPE_BROADCAST 0x00
