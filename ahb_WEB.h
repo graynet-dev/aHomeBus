@@ -5,65 +5,26 @@
 #include <SPI.h>  
 #include <Ethernet2.h>
 #include <EthernetUdp2.h>
-#include <ICMPPing.h>
 
 class AHB_WEB {
         private:
-        AHB *_ahb;
-         EthernetClass _interface_eth;
+         AHB *_ahb;
+
          EthernetClient client;
-         EthernetServer server = EthernetServer(80);
-        
-         unsigned long prevTimePingNode = 0;
-         unsigned long prevTimePing = 0;
-         byte countOnline;
-         ICMPPing _ping;
          
-         #define TOTAL_NET_DEVICES 12
-
-         //#define PING_REQUEST_TIMEOUT_MS     2500
-
-         char netDevicesNames[TOTAL_NET_DEVICES][8] = {"node_6", "node_7", "node_8", "node_9", "node_10", "node_11", "node_12", "node_13", "node_14", "node_19", "node_20", "node_21"}; // "node_18",
-         byte ips[TOTAL_NET_DEVICES][4] = { //{192, 168, 2, 101},
-                                  //{192, 168, 2, 102},
-                                  //{192, 168, 2, 103},
-                                  //{192, 168, 2, 104},
-                                  //{192, 168, 2, 105},
-                                  {192, 168, 2, 106}, // 
-                                  {192, 168, 2, 107},  // 
-                                  {192, 168, 2, 108}, // 
-                                  {192, 168, 2, 109},  // 
-                                  {192, 168, 2, 110}, // 
-                                  {192, 168, 2, 111}, // 
-                                  {192, 168, 2, 112}, // 
-                                  {192, 168, 2, 113}, // 
-                                  {192, 168, 2, 114}, // 
-                                  //{192, 168, 2, 118}, // 
-                                  {192, 168, 2, 119}, //
-                                  {192, 168, 2, 120}, // 
-                                  {192, 168, 2, 121}};//
-        byte online[TOTAL_NET_DEVICES] = {0};
-        SOCKET pingSocket = 0;                        
-        char pingMessage[64]; // 256 original
-        char buffer [256];
-        bool lastPingSucceeded = false;
-        
+         EthernetServer server = EthernetServer(80);
+             
+         char node_name[22][30] = {"0","node_1_Net_center_PC", "node_2_Net_center_oraPi1","node_3_Net_center_oraPi2","node_4_Net_center_Due1","node_5_Net_center_Due2","node_6_Hallway_net_center","node_7_Hallway_main","node_8_Hallway_light","node_9_Kitchen_net_center","node_10_Kitchen_main","node_11_Kitchen_light","node_12_WC_main","node_13_WC_waterleak","node_14_Bathroom_main","node_15_Boxroom_main","node_16_Balcony_meteo","node_17_Loggia_main","node_18_Loggia_recuoerator","node_19_Livingroom_main","node_20_Bedroom_main","node_21_Cabinet_main"};                  
+      
         public:
         
-        AHB_WEB(uint8_t _cspin);
+         AHB_WEB(uint8_t _cspin);
         
-        void Ping_node(void);
+         void begin(void);
         
-        void Ping_node_async(uint8_t i);
+         bool webAttach(AHB *ahb);
         
-        void someCriticalStuffThatCantWait(void);
-        
-        void begin(uint8_t *mac_address, IPAddress local_ip, IPAddress dns_server, IPAddress gateway, IPAddress subnet);
-        
-        char webAttach(AHB *ahb);
-        
-        
-        void loop_web();
+         void loop_web();
 };
 
 #endif
