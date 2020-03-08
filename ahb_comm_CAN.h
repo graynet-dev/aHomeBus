@@ -188,6 +188,14 @@ const byte timeoutsArray [3][2]= {
             byte begin(void);
             
             void mcp2515_reset(void);
+            
+            uint8_t checkError(void);
+            
+            uint8_t errorCountRX(void);
+            
+            uint8_t errorCountTX(void); 
+            
+            uint8_t getError(void);
 
             /**
              * Parse CAN-address into our metadata format
@@ -263,3 +271,31 @@ const byte timeoutsArray [3][2]= {
 };
 
 #endif /* AHB_CAN__H */
+
+            /* typedef enum enum_nodeState {
+                 Initialisation  = 0x00,  // 0:   'INITIALISING',    - +
+                 Disconnected    = 0x01,  // 1:   ''
+                 Connecting      = 0x02,  // 2:   ''
+                 Preparing       = 0x02,  // 3:   ''
+                 Stopped         = 0x04,  // 4:   'STOPPED',         - +
+                 Operational     = 0x05,  // 5:   'OPERATIONAL',     - + полный функционал
+                                          // 80:  'SLEEP',          -
+                                          // 96:  'STANDBY',        -
+                 Pre_operational = 0x7F,  // 127: 'PRE-OPERATIONAL'- + конфигурирование по SDO, PDO отключен???
+                 Unknown_state   = 0x0F   //
+            }e_nodeState;         
+
+            typedef struct {
+                 INTEGER8 csBoot_Up;
+                 INTEGER8 csSDO;
+                 INTEGER8 csEmergency;
+                 INTEGER8 csSYNC;
+                 INTEGER8 csLifeGuard;
+                 INTEGER8 csPDO;
+                 INTEGER8 csLSS;
+            } s_state_communication;
+            */ 
+            
+            /**
+             * Bus address of this node
+             */
