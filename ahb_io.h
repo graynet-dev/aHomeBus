@@ -31,7 +31,7 @@
       #endif
     #include <ahb.h>
 
-    class AHB; //AHB has not been defined yet
+class AHB; //AHB has not been defined yet
 
     /**
      * IO Module
