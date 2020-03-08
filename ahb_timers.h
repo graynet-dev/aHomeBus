@@ -1,6 +1,6 @@
 
-#ifndef __CO_timer_h__
-#define __CO_timer_h__
+#ifndef __ahb_timer_h__
+#define __ahb_timer_h__
 
 #include "Timer.h"
 
@@ -41,4 +41,4 @@ TIMER_HANDLE DelAlarm(TIMER_HANDLE handle);
 void TimeDispatch(void);
 
 
-#endif /* #define __timer_h__ */
+#endif /* #define __ahb_timer_h__ */
