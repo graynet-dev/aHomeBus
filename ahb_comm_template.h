@@ -63,6 +63,11 @@ class AHB_COMM {
              * @return error code, 0=OK
              */
             virtual byte begin(void) = 0;
+            
+            virtual uint8_t checkError(void);
+            virtual uint8_t errorCountRX(void);
+            virtual uint8_t errorCountTX(void); 
+            virtual uint8_t getError(void);
 
 /**
 Заполнение очереди команд
