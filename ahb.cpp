@@ -29,61 +29,53 @@
     #ifdef AHB_EEPROM_USE
       #include<EEPROM.h>
     #endif
+    
 
     
-AHB::AHB(unsigned int start, unsigned int stop, uint8_t ndType)  {
+AHB::AHB(unsigned int start, unsigned int stop, uint8_t ndType)  {   
 
         if(_cfgAddrStop < _cfgAddrStart+2) _cfgAddrStop = _cfgAddrStart;
         _nodeType=ndType;
         //Read NodeID from EEPROM
         uint8_t cfg = 0;
         #ifdef AHB_EEPROM_USE
-        EEPROM.get(_cfgAddrStart, cfg);
+          EEPROM.get(_cfgAddrStart, cfg);
         #endif
         setNodeId(cfg);
         _cfgAddrStop = stop;
         _cfgAddrStart = start;
 
         #ifdef AHB_DEBUG
-        Serial.println("                       ");
-        Serial.print(F("Node type - ")); 
+            Serial.println("                       ");
+            Serial.print(F("Node type - ")); 
         #endif //AHB_DEBUG
         
         switch(_nodeType) {
               case Master: {
                    #ifdef AHB_DEBUG
                       Serial.println(F("Master"));
-                   #endif //AHB_DEBUG
-                   
-                  
+                   #endif //AHB_DEBUG                
                    break;
               }
               case Slave:{
                    #ifdef AHB_DEBUG
                       Serial.println(F("Slave"));
                    #endif //AHB_DEBUG 
-                
                    break;
-
               }  
               case Node:{
                    #ifdef AHB_DEBUG
                       Serial.println(F("Node"));
                    #endif //AHB_DEBUG
-                
                    break;
               }
               default: {
                     #ifdef AHB_DEBUG
-                    Serial.println(F("UNCNOWN_Node")); 
+                        Serial.println(F("UNCNOWN_Node")); 
                     #endif //AHB_DEBUG
-                    
                     break; 
               }      
-              
         }
-        
-              
 }
 
 AHB::AHB(uint8_t id, uint8_t ndType) {      
@@ -93,8 +85,8 @@ AHB::AHB(uint8_t id, uint8_t ndType) {
         _cfgAddrStart = 0;
         
         #ifdef AHB_DEBUG
-        Serial.println("                       ");
-        Serial.print(F("Node type - ")); 
+            Serial.println("                       ");
+            Serial.print(F("Node type - ")); 
         #endif //AHB_DEBUG
         
         switch(_nodeType) {
@@ -102,45 +94,40 @@ AHB::AHB(uint8_t id, uint8_t ndType) {
                    #ifdef AHB_DEBUG
                       Serial.println(F("Master"));
                    #endif //AHB_DEBUG
-                   
-                   
                    break;
               }
               case Slave:{
                    #ifdef AHB_DEBUG
                       Serial.println(F("Slave"));
                    #endif //AHB_DEBUG 
-                
                    break;
-
               }  
               case Node:{
                    #ifdef AHB_DEBUG
                       Serial.println(F("Node"));
                    #endif //AHB_DEBUG
-                
                    break;
               }
               default: {
                     #ifdef AHB_DEBUG
-                    Serial.println(F("UNCNOWN_Node")); 
+                        Serial.println(F("UNCNOWN_Node")); 
                     #endif //AHB_DEBUG
-                    
                     break; 
               }      
-              
         }
 }
 
-void watchdogSetup(void) {
-  /*** watchdogDisable (); ***/
-}
+
+
+void watchdogSetup(void) {/*** watchdogDisable (); ***/}
 
 byte AHB::begin() {
         Wire.begin();
         #if defined  (__AVR__)
           wdt_enable(WDTO_8S); // разрешение работы сторожевого таймера с тайм-аутом 8 с
-          Serial.println(F("Set WTD AVR"));
+          #ifdef AHB_DEBUG
+              Serial.println(F("Set WTD AVR"));
+          #endif //AHB_DEBUG    
           //WTD_set(1);
         #else
           watchdogSetup();
@@ -151,44 +138,46 @@ byte AHB::begin() {
           watchdog frequency is therefore 32768 / 128 = 256 Hz
           WDV holds the periode in 256 th of seconds  */   
           status_wdt = (RSTC->RSTC_SR & RSTC_SR_RSTTYP_Msk) >> RSTC_SR_RSTTYP_Pos; // Get status from the last Reset      
-          Serial.print(F("Set WTD DUE ")); Serial.print(" RSTTYP = 0b "); Serial.println(status_wdt, BIN);
+          #ifdef AHB_DEBUG
+              Serial.print(F("Set WTD DUE ")); 
+              Serial.print(" RSTTYP = 0b "); 
+              Serial.println(status_wdt, BIN);
+          #endif //AHB_DEBUG
         #endif
+
+        
+        
+        if (_nodeType==Master){ //Игры с классами мастер
+         // AHB_MMO AHB_MMO_0;
+         // AHB_MMO_0.begin();
+         // _master->test();
+        }
 }
 
 void AHB::WTD(void){
-        //Serial.println (F(" WTD loop "));
         if  (millis() - prevtime_wtd > 7500) { ///WDTO_8S -1000) 
-          //Serial.println(F("Reset WTD"));
           #if defined  (__AVR__)
             wdt_reset();  // сброс сторожевого таймера
             prevtime_wtd = millis();
           #else
             WDT->WDT_CR = WDT_CR_KEY(WDT_KEY)| WDT_CR_WDRSTT;
             GPBR->SYS_GPBR[0] += 1;
-            //Serial.print("GPBR = "); Serial.println(GPBR->SYS_GPBR[0]);
             prevtime_wtd = millis();
           #endif
         }
 }
 
-//void AHB::watchdogSetup (void) __attribute__ ((weak, alias("_watchdogDefaultSetup")));
-
 bool AHB::WTD_set(bool set_wdt){
-       Serial.print(F("WTD!"));
-        //WDTO_15MS      // 15 мс 
-        //WDTO_30MS      // 30 мс 
-        //WDTO_60MS      // 60 мс 
-        //WDTO_120MS    // 120 мс 
-        //WDTO_250MS    // 250 мс 
-        //WDTO_500MS    // 500 мс 
-        //WDTO_1S            // 1 сек 
-        //WDTO_2S            // 2 сек 
-        //WDTO_4S           // 4 сек 
-        //WDTO_8S          // 8 сек
+        #ifdef AHB_DEBUG
+            Serial.print(F("WTD!"));
+        #endif //AHB_DEBUG
+        //WDTO_15MS // 15 мс  //WDTO_30MS // 30 мс  //WDTO_60MS // 60 мс //WDTO_120MS // 120 мс //WDTO_250MS // 250 мс //WDTO_500MS // 500 мс //WDTO_1S // 1 сек //WDTO_2S // 2 сек //WDTO_4S // 4 сек //WDTO_8S // 8 сек
         if (set_wdt){
           #if defined  (__AVR__)         
             wdt_enable(WDTO_8S);
-            Serial.print(F("Enable WTD"));
+            #ifdef AHB_DEBUG
+                Serial.print(F("Enable WTD"));
+            #endif //AHB_DEBUG
             return 1;
           #else
             watchdogEnable(1000);
@@ -198,24 +187,26 @@ bool AHB::WTD_set(bool set_wdt){
         else{
           #if defined  (__AVR__)
             wdt_disable();
-            Serial.print(F("Disable WTD"));
+            #ifdef AHB_DEBUG
+                Serial.print(F("Disable WTD"));
+            #endif //AHB_DEBUG
             return 0;
           #else
             watchdogDisable ();
             return 0;
           #endif
         }
-
 }
 
 
 
-bool AHB::firstboot(void (*function)()) {
+bool AHB::firstboot(void (*function)(),bool manual) {
         if(function == NULL) return false;
-        if(_nodeId < 1 || _nodeId > 255) {
+        if(_nodeId < 1 || _nodeId > 255 || manual) { 
             #ifdef AHB_DEBUG
-                Serial.print(F("Running initial configuration")); Serial.println(); Serial.flush();
-            #endif
+                Serial.print(F("Running initial configuration")); 
+                Serial.println(); 
+            #endif //AHB_DEBUG
             function();
             return true;
         }else{
@@ -228,25 +219,59 @@ bool AHB::setNodeId(unsigned int id) {
         _nodeId = id;
         #ifdef AHB_EEPROM_USE
           EEPROM.put(_cfgAddrStart, id);
-        #endif
+        #endif //AHB_EEPROM_USE
         return true;
 }
 
+//void ahb_RXInt() {
+//      ahbPacket pkg;
+//      ahbReceive(pkg);
+//}
+
+bool AHB::masterAttach(AHB_MASTER *mas) {
+  _master = mas;
+  return true;
+}
+
+bool AHB::slaveAttach(AHB_SLAVE *sla) {
+  _slave = sla;
+  return true;
+}
+
+bool AHB::nodeAttach(AHB_NODE *nod) {
+  _node = nod;
+  return true;
+}
+
+bool AHB::NodeGuard_OK_check (uint8_t a, uint8_t b){
+  bool x;
+  if (_nodeType==Master){
+    x=_master->NodeGuard_OK[a][b];
+  }
+  if (_nodeType==Slave){
+    x=_slave->NodeGuard_OK[a][b];
+  }
+  return x;
+}
+
 char AHB::busAttach(AHB_COMM *bus) {
+      
+       //attachInterrupt(2, ahb_RXInt, FALLING); //вместо 2 поставить INT PIN 
+
         for(signed char busId=0; busId<AHB_BUSNUM; busId++) {
             if(_busAddr[busId] == 0x00) {
-                _busAddr[busId] = bus;
-                               
+                _busAddr[busId] = bus;                              
                 byte err = bus->begin();
-                //#ifdef AHB_DEBUG
-                Serial.println();
-                Serial.print(F("Attach Bus type - ")); Serial.println(bus->busType()); 
-                //#endif
+                #ifdef AHB_DEBUG
+                    Serial.println();
+                    Serial.print(F("Attach Bus type - ")); Serial.println(bus->busType()); 
+                #endif //AHB_DEBUG
                 if(err == 0) {
-                    //Boot message
+                    //Boot message //Отправка в сеть сообщения что узел включился
                     byte data[1] = {AHB_CMD_BOOT};
-                    bus->ahbSend_V(AHB_PKGTYPE_MULTICAST, 0, 0, 0, _nodeId,  sizeof(data), data);
-                    // Нужно вызвать ahbNMT_on_boot(on_boot, *bus);
+                    bus->ahbSend_V(AHB_PKGTYPE_MULTICAST, AHB_CMD_F_NMT_BOOT, 0, 0, _nodeId,  sizeof(data), data);
+                    //!!! 
+                    //Нужно вызвать ahbNMT_on_boot(on_boot, *bus);
                     return busId;
                 }else{
                     _busAddr[busId] = 0x00;
@@ -267,63 +292,63 @@ bool AHB::busDetach(signed char busId) {
 unsigned int AHB::cfgFindFreeblock(byte bytes, byte id) {
         if(_cfgAddrStart == _cfgAddrStop)  {
             #ifdef AHB_DEBUG
-                Serial.print(F("EEPROM space 0")); Serial.println(); Serial.flush();
-            #endif
+                Serial.print(F("EEPROM space 0")); Serial.println(); 
+            #endif //AHB_DEBUG
             return 0;
         }
         
         bytes++; //Header
         
         #ifdef AHB_DEBUG
-            Serial.print(F("ID is ")); Serial.println(id); Serial.flush();
-            Serial.print(F("size is ")); Serial.println(bytes, HEX); Serial.flush();
-        #endif
+            Serial.print(F("ID is ")); Serial.println(id); 
+            Serial.print(F("size is ")); Serial.println(bytes, HEX); 
+        #endif //AHB_DEBUG
 
         unsigned int address = _cfgAddrStart+2; //bytes 1+2 are our ID
         byte check,len;
 
         if(((int)_cfgAddrStop-_cfgAddrStart-bytes) < 0) {
             #ifdef AHB_DEBUG
-                Serial.print(F("Space < length")); Serial.println(); Serial.flush();
-            #endif
+                Serial.print(F("Space < length")); Serial.println(); 
+            #endif //AHB_DEBUG
             return 0;
         }
 
         do {
             #ifdef AHB_EEPROM_USE
             check = EEPROM.read(address);
-            #endif
+            #endif //AHB_EEPROM_USE
             #ifdef AHB_DEBUG
-                Serial.print(F("check addr ")); Serial.println(address); Serial.flush();
-                Serial.print(F(" = ")); Serial.println(check, HEX); Serial.flush();
-            #endif
+                Serial.print(F("check addr ")); Serial.println(address); 
+                Serial.print(F(" = ")); Serial.println(check, HEX); 
+            #endif //AHB_DEBUG
             if(check == 0xFF || check == 0) { //Nothing saved yet
                 len = 0;
                 while(((1 << len) + 5) < bytes) {
                     #ifdef AHB_DEBUG
-                        Serial.print(F("Testing length")); Serial.println(len); Serial.flush();
-                    #endif
+                        Serial.print(F("Testing length")); Serial.println(len); 
+                    #endif //AHB_DEBUG
                     len++;
                     if(len > 0x0F) {
                         #ifdef AHB_DEBUG
-                            Serial.print(F("length exceeded")); Serial.println(); Serial.flush();
-                        #endif
+                            Serial.print(F("length exceeded")); Serial.println(); 
+                        #endif //AHB_DEBUG
                         return 0;
                     }
                 }
                 #ifdef AHB_DEBUG
-                    Serial.print(F("final length")); Serial.println(len); Serial.flush();
-                #endif
+                    Serial.print(F("final length")); Serial.println(len); 
+                #endif //AHB_DEBUG
 
                 check  = (id << 4) | len;
                 
                 #ifdef AHB_DEBUG
-                    Serial.print(F("ID is now ")); Serial.println(check, HEX); Serial.flush();
-                #endif
+                    Serial.print(F("ID is now ")); Serial.println(check, HEX); 
+                #endif //AHB_DEBUG
                 
                 #ifdef AHB_EEPROM_USE
                 EEPROM.write(address, check);
-                #endif
+                #endif //AHB_EEPROM_USE
                 
                 return address;
             }
@@ -372,7 +397,7 @@ bool AHB::hookAttachModule(AHB_IO *module) {
                     do {
                         #ifdef AHB_EEPROM_USE
                         check = EEPROM.read(address);
-                        #endif
+                        #endif //AHB_EEPROM_USE
                         len = ((1 << (check & 0x0F)) + 5);
                         if((check & 0xF0) == id) { //this is probably related to our module
                             num++;
@@ -390,7 +415,7 @@ bool AHB::hookAttachModule(AHB_IO *module) {
                         do {
                             #ifdef AHB_EEPROM_USE
                             check = EEPROM.read(address);
-                            #endif
+                            #endif //AHB_EEPROM_USE
                             len = ((1 << (check & 0x0F)) + 5);
                             if((check & 0xF0) == id) { //this is probably related to our module
                                 module->cfgRead(address);
@@ -401,15 +426,16 @@ bool AHB::hookAttachModule(AHB_IO *module) {
                     }else{
                         #ifdef AHB_DEBUG
                             Serial.print(F("ERR RES ")); 
-                        #endif
+                        #endif //AHB_DEBUG
                         return false;
                     }
                 }
             }
         }
         #ifdef AHB_DEBUG
-            Serial.print(F("No free module slot to attach")); Serial.println(); Serial.flush();
-        #endif
+            Serial.print(F("No free module slot to attach")); 
+            Serial.println(); 
+        #endif //AHB_DEBUG
         return false;
 }
 
@@ -438,8 +464,10 @@ void AHB::system_uptime(void) {
           } 
           prevSystemtime_ut = curMillis;
           
-          //PrintSystemUpTime();
+          //PrintSystemUpTime();          
           
+          //Так как аппаратные часы есть только в мастере а время приходит раз в 5 сек, 
+          //продолжаем крутить счетчик для коррекции псевдоаппаратного времени
           if (_nodeType==Master){
             system_hwtime(); //извлечение времени из DS3231
             //PrintSystemHwTime();
@@ -468,8 +496,7 @@ void AHB::system_uptime(void) {
         } 
 } 
 
-void AHB::PrintSystemUpTime (void){
-  //Serial.println(); 
+void AHB::PrintSystemUpTime (void){ 
   Serial.print("System Up Time - ");
   if (dd_ut<10)  Serial. print (F("0")); 
   Serial. print (dd_ut);  
@@ -486,7 +513,6 @@ void AHB::PrintSystemUpTime (void){
 }
 
 void AHB::PrintSystemHwTime (void){
-  //Serial.println(); 
   Serial.print("System HW Time - ");
 //Время
   if (hh_hw<10)  Serial. print (F("0")); 
@@ -534,7 +560,7 @@ void AHB::PrintSystemHwTime (void){
   Serial.print(".20");  
   Serial.print(year_hw, DEC);
 //Температура CPU
- Serial.print(" - T CPU - "); //Serial.println(temp_hw);
+ Serial.print(" - T CPU - "); Serial.println(temp_hw);
 }
 
 
@@ -560,7 +586,6 @@ uint8_t AHB::print_ss_ut(void){return ss_ut;}
 uint8_t AHB::print_mm_ut(void){return mm_ut;}
 uint8_t AHB::print_hh_ut(void){return hh_ut;}
 uint8_t AHB::print_dd_ut(void){return dd_ut;}
-
 uint8_t AHB::print_ss_hw(void){return ss_hw;}
 uint8_t AHB::print_mm_hw(void){return mm_hw;}
 uint8_t AHB::print_hh_hw(void){return hh_hw;}
@@ -569,10 +594,31 @@ uint8_t AHB::print_month_hw(void){return month_hw;}
 uint8_t AHB::print_year_hw(void){return year_hw;}
 uint8_t AHB::print_dayofweak_hw(void){return dayOfWeek_hw;}
 
-uint8_t AHB::print_ss_rn(uint8_t i){return ss_ut_rn[i];}
-uint8_t AHB::print_mm_rn(uint8_t i){return mm_ut_rn[i];}
-uint8_t AHB::print_hh_rn(uint8_t i){return hh_ut_rn[i];}
-uint8_t AHB::print_dd_rn(uint8_t i){return dd_ut_rn[i];}
+uint8_t AHB::print_tx_error_rn(uint8_t i){
+  if (_nodeType==Master) {return _master->ut_rn[i][5];}
+  if (_nodeType==Slave) {return _slave->ut_rn[i][5];}
+}
+uint8_t AHB::print_rx_error_rn(uint8_t i){
+  if (_nodeType==Master) {return _master->ut_rn[i][4];}
+  if (_nodeType==Slave) {return _slave->ut_rn[i][4];}
+}
+uint8_t AHB::print_ss_rn(uint8_t i){
+  if (_nodeType==Master) {return _master->ut_rn[i][3];}
+  if (_nodeType==Slave) {return _slave->ut_rn[i][3];}
+}
+uint8_t AHB::print_mm_rn(uint8_t i){
+  if (_nodeType==Master) {return _master->ut_rn[i][2];}
+  if (_nodeType==Slave) {return _slave->ut_rn[i][2];}
+}
+uint8_t AHB::print_hh_rn(uint8_t i){
+  if (_nodeType==Master) {return _master->ut_rn[i][1];}
+  if (_nodeType==Slave) {return _slave->ut_rn[i][1];}
+}
+uint8_t AHB::print_dd_rn(uint8_t i){
+  if (_nodeType==Master) {return _master->ut_rn[i][0];}
+  if (_nodeType==Slave) {return _slave->ut_rn[i][0];}
+}
+
 
 // Convert normal decimal numbers to binary coded decimal
 byte AHB::decToBcd(byte val){return( (val/10*16) + (val%10) );}
@@ -664,9 +710,9 @@ byte AHB::ahbSend(uint8_t type, uint8_t cmd, uint8_t target, uint8_t port, uint8
                 Serial.print(busId);  Serial.print(F(" Form source - "));Serial.println(source);
                 #endif //AHB_DEBUG
                 //Отправка в шину busId
-                //state = _busAddr[busId]->ahbSend_V(type, cmd, target,  port, source, len, data);
+                state = _busAddr[busId]->ahbSend_V(type, cmd, target,  port, source, len, data);
                 //Отправка в очередь сообщений с busId  
-                state = ahbAddSendMsgQueue(type, cmd, target, port, source, len, data, busId);
+                //////state = ahbAddSendMsgQueue(type, cmd, target, port, source, len, data, busId);
                 if(!state) errors++;                     
             }
             
@@ -688,10 +734,10 @@ byte AHB::ahbSend(uint8_t type, uint8_t cmd, uint8_t target, uint8_t port, uint8
              Serial.print(busId_route); Serial.print(F(" Form source - "));Serial.println(source);
              //#endif //AHB_DEBUG
              //Отправка в шину busId_route
-             //state = _busAddr[busId_route]->ahbSend_V(type, cmd, target,  port, source, len, data);
+             state = _busAddr[busId_route]->ahbSend_V(type, cmd, target,  port, source, len, data);
              
              //Отправка в очередь сообщений с busId_route   
-             state = ahbAddSendMsgQueue(type, cmd, target, port, source, len, data, busId_route);
+             //////state = ahbAddSendMsgQueue(type, cmd, target, port, source, len, data, busId_route);
              if(!state) errors++;          
           }
         }
@@ -717,13 +763,13 @@ bool AHB::ahbReceive(ahbPacket &pkg) {
 
 bool AHB::ahbReceive(ahbPacket &pkg, bool routing) { //Нахуй роутинг вообще вызывается, нужны флаги из конфига
         typedef enum pkg_state_enum {
-           pkg_for_unknown,
-           pkg_for_my_broadcast,
-           pkg_for_my_address,
-           pkg_for_net,
-           pkg_for_ptp,
-           pkg_for_my_broadcast_other_net,   ///
-           pkg_for_my_other_net
+           pkg_for_unknown,                //Получатель не определен, не найден в таблице маршрутов
+           pkg_for_my_broadcast,           //Получатель я, получено широковещательно
+           pkg_for_my_address,             //Получатель я, получено адресно
+           pkg_for_net,                    //Получатель в сети подключенной ко мне
+           pkg_for_ptp,                    //Получатель один из P-t-P подключеный ко мне
+           pkg_for_my_broadcast_other_net, //Получатель в другой сети подключеной ко мне, получено широковещательно
+           pkg_for_my_other_net            //Получатель в другой сети
         }pkg_state_ENUM;
 
         //Пришедшие сообщения по target (кому) делятся на
@@ -743,30 +789,61 @@ bool AHB::ahbReceive(ahbPacket &pkg, bool routing) { //Нахуй роутинг
                     
         bool checkBusReceive = false; //Наличие пакета в шине
         uint8_t ReceiveBusType;       //Тип шины в которую пришел пакет;
+        uint8_t BusTypeGW_UDP;
+        uint8_t BusTypeGW_OKBIT;
         signed char busId_route;
         uint8_t packet_state;
-        for(signed char busId=0; busId<AHB_BUSNUM; busId++) { //Перебираем все шины на пришедший пакет
+        //uint8_t GW_CAN_TO_UDP_BusType;
+        
+        for(signed char busId=0; busId<AHB_BUSNUM; busId++) { //Перебираем все шины и смотрим есть ли пришедший пакет
             if(_busAddr[busId] != 0x00) {
                 busId_route = 0;
                 bool target_my_net = false;
                 bool source_my_net = false;
-                //Проверяем есть ли пришедний пакет из этой шины
-                checkBusReceive = _busAddr[busId]->ahbReceive_V(pkg);
+                //Вытаскиваем busId_GW_CAN_TO_UDP
+                BusTypeGW_UDP = _busAddr[busId]->busType();
+                  //Serial.print(BusTypeGW_UDP);Serial.println(" - CAN UDP TYPE");
+                if (BusTypeGW_UDP==type_GW_CAN_TO_UDP){
+                  //Serial.println("CAN UDP ATTACHED");
+                  busId_GW_CAN_TO_UDP=busId;
+                }
+                else{
+                  //Serial.print(busId_GW_CAN_TO_UDP);Serial.println(" - CAN UDP bus");
+                }
                 
+                //Вытаскиваем busId_GW_CAN_TO_OKBIT
+                BusTypeGW_OKBIT = _busAddr[busId]->busType();
+                  //Serial.print(BusTypeGW_OKBIT);Serial.println(" - CAN OKBIT TYPE");
+                if (BusTypeGW_OKBIT==type_GW_CAN_TO_OKBIT){
+                  //Serial.println("CAN OKBIT ATTACHED");
+                  busId_GW_CAN_TO_OKBIT=busId;
+                }
+                else{
+                  //Serial.print(busId_GW_CAN_TO_OKBIT);Serial.println(" - CAN UDP bus");
+                }
+                //Проверяем есть ли пришедний пакет из этой шины
+                checkBusReceive = _busAddr[busId]->ahbReceive_V(pkg);                
                 //Если пакет пришел то начинаем его разбор на предмет игнора, ретрансляции или маршрутизации
                 if(checkBusReceive) {
-                   
-                   //Заполняем очередь пришедших сообщений
-                   ahbAddRcvMsgQueue(pkg);
-                   
-                   //Все что ниже вынести в отдельную функцию
+                    //Serial.println("Receive MSG");
+                   //Заполняем очередь пришедших сообщений - Зачем ???
+                   /////////////////НЕ реализовано ahbAddRcvMsgQueue(pkg); 
+                   //Все что ниже вынести в отдельную функцию - Зачем ???
                    ReceiveBusType = _busAddr[busId]->busType();
+                   //Отправка CAN по UDP на сервер
+                   if (_busAddr[busId_GW_CAN_TO_UDP] != 0x00){
+                       Serial.println("CAN UDP");
+                      _busAddr[busId_GW_CAN_TO_UDP]->ahbSend_V(pkg.meta.type, pkg.meta.cmd, pkg.meta.target,  pkg.meta.port, pkg.meta.source, sizeof(pkg.data), pkg.data);
+                   }
+                   //Отправка в Majordomo Okbit UDP
+                   if (_busAddr[busId_GW_CAN_TO_OKBIT] != 0x00){
+                       Serial.println("CAN OKBIT");
+                      _busAddr[busId_GW_CAN_TO_OKBIT]->ahbSend_V(pkg.meta.type, pkg.meta.cmd, pkg.meta.target,  pkg.meta.port, pkg.meta.source, sizeof(pkg.data), pkg.data);
+                   }                   
                    pkg.meta.busId = busId;
                    pkg.meta.busType = ReceiveBusType;
-                                    
-                   packet_state=pkg_for_unknown;
-                   
-                   //перебираем таблицу маршрутов сети в которой пришел пакет 
+                   packet_state=pkg_for_unknown; //Изначально ставим статус кому - неизвестно
+                   //перебираем таблицу маршрутов сети в которой есть пришедший пакет 
                     for (int i=0; i<_busAddr[busId]->net_size_get();i++){ 
                       //смотрим есть ли target в таблице маршрутов, игнорируем 0 не по адресу 0
                       if ((pkg.meta.target==_busAddr[busId]->address_network_get(i)&&_busAddr[busId]->address_network_get(i)!=0)||(_busAddr[busId]->address_network_get(0)==pkg.meta.target&&i==0)){
@@ -817,122 +894,127 @@ bool AHB::ahbReceive(ahbPacket &pkg, bool routing) { //Нахуй роутинг
                     if (target_my_other_net == true) {
                       packet_state=pkg_for_net; 
                     }
-                    
-                    //packet_state=pkg_for_ptp ПОКА НЕ РЕАЛИЗОВАНО
-                    
+
+                    //Serial.println(F("RX PACKET"));
                     switch (packet_state){
-                      case pkg_for_unknown: {
+                      case pkg_for_unknown: { //Получатель не определен
                         #ifdef AHB_DEBUG
-                        Serial.print(F("RX target pkg_for_unknown IGNORE"));
-                        Serial.print(F(" BUS ID - "));Serial.print(busId);
-                        Serial.print(F(" Target - "));Serial.print(pkg.meta.target); 
-                        Serial.print(F(" Source - "));Serial.print(pkg.meta.source);
-                        Serial.print(F("  Length: 0x"));Serial.print(pkg.len);
-                        for(byte i=0; i<pkg.len; i++) {
-                          Serial.print(F(" 0x"));Serial.print(pkg.data[i]);
-                        }
-                        Serial.println();
+                          Serial.print(F("RX target pkg_for_unknown IGNORE"));
+                          Serial.print(F(" BUS ID - "));Serial.print(busId);
+                          Serial.print(F(" Target - "));Serial.print(pkg.meta.target); 
+                          Serial.print(F(" Source - "));Serial.print(pkg.meta.source);
+                          Serial.print(F("  Length: 0x"));Serial.print(pkg.len);
+                          for(byte i=0; i<pkg.len; i++) {
+                            Serial.print(F(" 0x"));Serial.print(pkg.data[i]);
+                          }
+                          Serial.println();
                         #endif
                         break;
                       }
-                      case pkg_for_my_broadcast: {
+                      case pkg_for_my_broadcast: { //Получатель я, получено широковещательно
                         #ifdef AHB_DEBUG
-                        Serial.print(F("RX target pkg_for_my_broadcast IN JOB"));
-                        Serial.print(F(" BUS ID - "));Serial.print(busId);
-                        Serial.print(F(" Target - "));Serial.print(pkg.meta.target);
-                        Serial.print(F(" Source - "));Serial.print(pkg.meta.source);
-                        Serial.print(F("  Length: 0x"));Serial.print(pkg.len);
-                        for(byte i=0; i<pkg.len; i++) {
-                          Serial.print(F(" 0x"));Serial.print(pkg.data[i]);
-                        }
-                        Serial.println();
-                        #endif
-                        ahbProcess(pkg);
-                        ahbRxProcessingNode(pkg);
-                        break;
-                      }
-                      case pkg_for_my_address: {
-                        #ifdef AHB_DEBUG
-                        Serial.print(F("RX target pkg_for_my_address IN JOB"));
-                        Serial.print(F(" BUS ID - "));Serial.print(busId);
-                        Serial.print(F(" Target - "));Serial.print(pkg.meta.target);
-                        Serial.print(F(" Source - "));Serial.print(pkg.meta.source);
-                        Serial.print(F("  Length: 0x"));Serial.print(pkg.len);
-                        for(byte i=0; i<pkg.len; i++) {
-                          Serial.print(F(" 0x"));Serial.print(pkg.data[i]);
-                        }
-                        Serial.println();
+                          Serial.print(F("RX target pkg_for_my_broadcast IN JOB"));
+                          Serial.print(F(" BUS ID - "));Serial.print(busId);
+                          Serial.print(F(" Target - "));Serial.print(pkg.meta.target);
+                          Serial.print(F(" Source - "));Serial.print(pkg.meta.source);
+                          Serial.print(F("  Length: 0x"));Serial.print(pkg.len);
+                          for(byte i=0; i<pkg.len; i++) {
+                            Serial.print(F(" 0x"));Serial.print(pkg.data[i]);
+                          }
+                          Serial.println();
                         #endif
                         ahbProcess(pkg);
                         ahbRxProcessingNode(pkg);
                         break;
                       }
-                      case pkg_for_net: {
+                      case pkg_for_my_address: { //Получатель я, получено адресно
                         #ifdef AHB_DEBUG
-                        Serial.print(F("RX target pkg_for_net, ROUTE TO BUS - ")); Serial.print(_busAddr[busId_route]->busType());
-                        Serial.print(F(" BUS ID - "));Serial.print(busId_route);
-                        Serial.print(F(" Target - "));Serial.print(pkg.meta.target);
-                        Serial.print(F(" Source - "));Serial.print(pkg.meta.source);
-                        Serial.print(F("  Length: 0x"));Serial.print(pkg.len);
-                        for(byte i=0; i<pkg.len; i++) {
-                          Serial.print(F(" 0x"));Serial.print(pkg.data[i]);
-                        }
-                        Serial.println();
+                          Serial.print(F("RX target pkg_for_my_address IN JOB"));
+                          Serial.print(F(" BUS ID - "));Serial.print(busId);
+                          Serial.print(F(" Target - "));Serial.print(pkg.meta.target);
+                          Serial.print(F(" Source - "));Serial.print(pkg.meta.source);
+                          Serial.print(F("  Length: 0x"));Serial.print(pkg.len);
+                          for(byte i=0; i<pkg.len; i++) {
+                            Serial.print(F(" 0x"));Serial.print(pkg.data[i]);
+                          }
+                          Serial.println();
+                        #endif
+                        ahbProcess(pkg);
+                        ahbRxProcessingNode(pkg);
+                        break;
+                      }
+                      
+                      case pkg_for_net: { //Получатель в сети подключеной ко мне, источник в этой же сети
+                        #ifdef AHB_DEBUG
+                          Serial.print(F("RX target pkg_for_net, ROUTE TO BUS - ")); Serial.print(_busAddr[busId_route]->busType());
+                          Serial.print(F(" BUS ID - "));Serial.print(busId_route);
+                          Serial.print(F(" Target - "));Serial.print(pkg.meta.target);
+                          Serial.print(F(" Source - "));Serial.print(pkg.meta.source);
+                          Serial.print(F("  Length: 0x"));Serial.print(pkg.len);
+                          for(byte i=0; i<pkg.len; i++) {
+                            Serial.print(F(" 0x"));Serial.print(pkg.data[i]);
+                          }
+                          Serial.println();
                         #endif //AHB_DEBUG
-                        ahbAddSendMsgQueue(pkg.meta.type, pkg.meta.cmd, pkg.meta.target, pkg.meta.port, pkg.meta.source, pkg.len, pkg.data, busId_route);
-                        //ahbSend(pkg.meta.type, pkg.meta.cmd, pkg.meta.target, pkg.meta.port, pkg.meta.source, pkg.len, pkg.data);
+                        //перенаправляем полученый мной пакет получателю в другую полключенную ко мне сеть
+                        ///ahbAddSendMsgQueue(pkg.meta.type, pkg.meta.cmd, pkg.meta.target, pkg.meta.port, pkg.meta.source, pkg.len, pkg.data, busId_route);
+                        ahbSend(pkg.meta.type, pkg.meta.cmd, pkg.meta.target, pkg.meta.port, pkg.meta.source, pkg.len, pkg.data);
                         break;
                       }
+                      
+                      //packet_state=pkg_for_ptp ПОКА НЕ РЕАЛИЗОВАНО
                       case pkg_for_ptp: {
                         #ifdef AHB_DEBUG
-                        Serial.print(F("RX target pkg_for_ptp, ROUTE TO BUS - ")); Serial.print(_busAddr[busId_route]->busType());
-                        Serial.print(F(" BUS ID - "));Serial.print(busId_route);
-                        Serial.print(F(" Target - "));Serial.print(pkg.meta.target);
-                        Serial.print(F(" Source - "));Serial.print(pkg.meta.source);
-                        Serial.print(F("  Length: 0x"));Serial.print(pkg.len);
-                        for(byte i=0; i<pkg.len; i++) {
-                          Serial.print(F(" 0x"));Serial.print(pkg.data[i]);
-                        }
-                        Serial.println();
+                          Serial.print(F("RX target pkg_for_ptp, ROUTE TO BUS - ")); Serial.print(_busAddr[busId_route]->busType());
+                          Serial.print(F(" BUS ID - "));Serial.print(busId_route);
+                          Serial.print(F(" Target - "));Serial.print(pkg.meta.target);
+                          Serial.print(F(" Source - "));Serial.print(pkg.meta.source);
+                          Serial.print(F("  Length: 0x"));Serial.print(pkg.len);
+                          for(byte i=0; i<pkg.len; i++) {
+                            Serial.print(F(" 0x"));Serial.print(pkg.data[i]);
+                          }
+                          Serial.println();
                         #endif // AHB_DEBUG
                         break;
                       }
+                      
                       case pkg_for_my_broadcast_other_net: {
                         #ifdef AHB_DEBUG
-                        Serial.print(F("RX target pkg_for_my_broadcast_other_net IN JOB"));
-                        Serial.print(F(" BUS ID - "));
-                        Serial.print(busId_route);
-                        Serial.print(F(" Target - "));
-                        Serial.print(pkg.meta.target);
-                        Serial.print(F(" Source - "));
-                        Serial.print(pkg.meta.source);
-                        Serial.print(F("  Length: 0x"));
-                        Serial.print(pkg.len);
-                        for(byte i=0; i<pkg.len; i++) {
-                          Serial.print(F(" 0x"));
-                          Serial.print(pkg.data[i]);
-                        }
-                        Serial.println();
+                          Serial.print(F("RX target pkg_for_my_broadcast_other_net IN JOB"));
+                          Serial.print(F(" BUS ID - "));
+                          Serial.print(busId_route);
+                          Serial.print(F(" Target - "));
+                          Serial.print(pkg.meta.target);
+                          Serial.print(F(" Source - "));
+                          Serial.print(pkg.meta.source);
+                          Serial.print(F("  Length: 0x"));
+                          Serial.print(pkg.len);
+                          for(byte i=0; i<pkg.len; i++) {
+                            Serial.print(F(" 0x"));
+                            Serial.print(pkg.data[i]);
+                          }
+                          Serial.println();
                         #endif // AHB_DEBUG
                         ahbProcess(pkg);
                         break;
                       }
+                      
                       case pkg_for_my_other_net: {
                         #ifdef AHB_DEBUG
-                        Serial.print(F("RX target pkg_for_my_other_net IN JOB"));
-                        Serial.print(F(" BUS ID - "));
-                        Serial.print(busId_route);
-                        Serial.print(F(" Target - "));
-                        Serial.print(pkg.meta.target);
-                        Serial.print(F(" Source - "));
-                        Serial.print(pkg.meta.source);
-                        Serial.print(F("  Length: 0x"));
-                        Serial.print(pkg.len);
-                        for(byte i=0; i<pkg.len; i++) {
-                          Serial.print(F(" 0x"));
-                          Serial.print(pkg.data[i]);
-                        }
-                        Serial.println();
+                          Serial.print(F("RX target pkg_for_my_other_net IN JOB"));
+                          Serial.print(F(" BUS ID - "));
+                          Serial.print(busId_route);
+                          Serial.print(F(" Target - "));
+                          Serial.print(pkg.meta.target);
+                          Serial.print(F(" Source - "));
+                          Serial.print(pkg.meta.source);
+                          Serial.print(F("  Length: 0x"));
+                          Serial.print(pkg.len);
+                          for(byte i=0; i<pkg.len; i++) {
+                            Serial.print(F(" 0x"));
+                            Serial.print(pkg.data[i]);
+                          }
+                          Serial.println();
                         #endif // AHB_DEBUG
                         ahbProcess(pkg);
                         break;
@@ -942,18 +1024,9 @@ bool AHB::ahbReceive(ahbPacket &pkg, bool routing) { //Нахуй роутинг
                         break;
                       }
                     }
-                    
-                  /**
-                  if(routing) {
-                        //Resend to every interface except the one we received it on
-                        //Если роутинг кидаем на все шины кроме самого себя - ЭТО Хуйня
-                        ahbSend_M(pkg.meta.type, pkg.meta.target, pkg.meta.port, pkg.meta.source, pkg.len, pkg.data, pkg.meta.busId);
-                  }
-                  */
-                  
+                                      
                   //Еще реализовать ретрансляцию на UART и пр. шины, Видимо в конструкторе класса
-                  
-                  
+                                        
                   return true;
                 }
             }
@@ -961,27 +1034,18 @@ bool AHB::ahbReceive(ahbPacket &pkg, bool routing) { //Нахуй роутинг
         return false;
 }
 
+bool AHB::ahbReceiveRouting(ahbPacket &pkg, uint8_t packet_state, signed char busId_route){
+//Вырезать из вышестоящей функции и там переделать
+
+}
+
 void AHB::ahbRxProcessingNode(ahbPacket &pkg){
         byte i;
-
-        //cc_ut_rn[pkg.meta.source]=pkg.data[4];
-        //byte data[4] = {dd_hw,hh_hw, mm_hw, ss_hw}; //Отправляем аппаратное время
         byte data[4] = {dd_ut,hh_ut, mm_ut, ss_ut}; //Отправляем свой UP_time мастеру или запросившему
         bool status_send = false;
         switch(pkg.meta.cmd) {
             case AHB_CMD_F_NMT_PING:{ //Если нам PING отвечаем PONG, если от мастера устанавливаем время
               if (_nodeType!=Master){
-               
-                 /**Serial.println();
-                 Serial.println("Begin date/time - ");
-                 Serial.print(pkg.data[0]);Serial.print(" ");
-                 Serial.print(pkg.data[1]);Serial.print(" ");
-                 Serial.print(pkg.data[2]);Serial.print(" ");
-                 Serial.print(pkg.data[3]);Serial.print(" ");
-                 Serial.print(pkg.data[4]);Serial.print(" ");
-                 Serial.print(pkg.data[5]);Serial.print(" ");
-                 Serial.println(pkg.data[6]);
-                 Serial.println("End date/time"); */
                  hh_hw        = pkg.data[0];
                  mm_hw        = pkg.data[1];
                  ss_hw        = pkg.data[2];
@@ -990,25 +1054,122 @@ void AHB::ahbRxProcessingNode(ahbPacket &pkg){
                  year_hw      = pkg.data[5];
                  dayOfWeek_hw = pkg.data[6];
               }
-              PrintSystemUpTime();  PrintSystemHwTime(); Serial.println(F("Receive PING"));
+              PrintSystemUpTime();  PrintSystemHwTime(); Serial.print(F("Receive PING from - ")); Serial.println(pkg.meta.source); 
               status_send=ahbAddSendMsgQueue(AHB_PKGTYPE_UNICAST, AHB_CMD_F_NMT_PONG, pkg.meta.source, pkg.meta.port, _nodeId, sizeof(data), data, pkg.meta.busId);
               
               #ifdef AHB_DEBUG
-              if (status_send) Serial.println(F("AHB_CMD_PONG UNICAST-OK"));
-              else Serial.println(F("AHB_CMD_PONG UNICAST-FAIL"));
+                  if (status_send) Serial.println(F("AHB_CMD_PONG UNICAST-OK"));
+                  else Serial.println(F("AHB_CMD_PONG UNICAST-FAIL"));
               #endif
               
               break;
             }
             case AHB_CMD_F_NMT_PONG:{  //Если получили PONG
-              NodeGuard_OK[pkg.meta.source][1] = true; //Статус узла Заполняем двумерный массив где [Node ID][Live status]
-              //Заполняем полученый UPTIME от узлов
-              dd_ut_rn[pkg.meta.source]=pkg.data[0];
-              hh_ut_rn[pkg.meta.source]=pkg.data[1];
-              mm_ut_rn[pkg.meta.source]=pkg.data[2];
-              ss_ut_rn[pkg.meta.source]=pkg.data[3];
+              if (_nodeType==Master){
+                _master->NodeGuard_OK[pkg.meta.source][1] = true; //Статус узла Заполняем двумерный массив где [Node ID][Live status]
+                _master->NodeGuard_OK[pkg.meta.source][2]=true;
+                //Заполняем полученый UPTIME от узлов              
+                _master->ut_rn[pkg.meta.source][0]=pkg.data[0];
+                _master->ut_rn[pkg.meta.source][1]=pkg.data[1];
+                _master->ut_rn[pkg.meta.source][2]=pkg.data[2];
+                _master->ut_rn[pkg.meta.source][3]=pkg.data[3];
+                _master->ut_rn[pkg.meta.source][4]=pkg.data[4];
+                _master->ut_rn[pkg.meta.source][5]=pkg.data[5];   
+                Serial.print(F("Receive PONG from node - "));  Serial.println(pkg.meta.source);      
+              }
+              if (_nodeType==Slave){
+                _slave->NodeGuard_OK[pkg.meta.source][1] = true; //Статус узла Заполняем двумерный массив где [Node ID][Live status]
+                _slave->NodeGuard_OK[pkg.meta.source][2]=true;
+                //Заполняем полученый UPTIME от узлов              
+                _slave->ut_rn[pkg.meta.source][0]=pkg.data[0];
+                _slave->ut_rn[pkg.meta.source][1]=pkg.data[1];
+                _slave->ut_rn[pkg.meta.source][2]=pkg.data[2];
+                _slave->ut_rn[pkg.meta.source][3]=pkg.data[3];
+                _slave->ut_rn[pkg.meta.source][4]=pkg.data[4];
+                _slave->ut_rn[pkg.meta.source][5]=pkg.data[5];   
+                Serial.print(F("Receive PONG from node - "));  Serial.println(pkg.meta.source);      
+              }              
+              
               break;
             }
+            case AHB_CMD_F_NMT_HEARTBEAT_TO_SLAVE:{
+              if (_nodeType==Slave){
+                _slave->NodeGuard_OK[pkg.meta.source][1] = true; //Статус узла Заполняем двумерный массив где [Node ID][Live status]
+                _slave->NodeGuard_OK[pkg.meta.source][2]=true;
+                //Заполняем полученый UPTIME от узлов                
+                _slave->ut_rn[pkg.meta.source][0]=pkg.data[0];
+                _slave->ut_rn[pkg.meta.source][1]=pkg.data[1];
+                _slave->ut_rn[pkg.meta.source][2]=pkg.data[2];
+                _slave->ut_rn[pkg.meta.source][3]=pkg.data[3];
+                _slave->ut_rn[pkg.meta.source][4]=pkg.data[4];
+                _slave->ut_rn[pkg.meta.source][5]=pkg.data[5]; 
+                Serial.print(F("Receive HEARTBEAT_TO_SLAVE from node - ")); Serial.println(pkg.meta.source);             
+              }
+              
+              break;
+            }
+            
+            case AHB_CMD_F_NMT_HEARTBEAT:{ //Если нам HEARTBEAT, от мастера устанавливаем время
+              if (_nodeType==Node){
+                 //_node->heartbeat_count++;
+                 if (pkg.meta.source==4){ //Если от мастера устанавливаем время
+                  hh_hw        = pkg.data[0];
+                  mm_hw        = pkg.data[1];
+                  ss_hw        = pkg.data[2];
+                  dd_hw        = pkg.data[3];
+                  month_hw     = pkg.data[4];
+                  year_hw      = pkg.data[5];
+                  dayOfWeek_hw = pkg.data[6];     
+                         
+                 }
+                 
+                 //PrintSystemUpTime();  PrintSystemHwTime(); 
+               Serial.print(F("Receive HEARTBEAT from node - ")); Serial.println(pkg.meta.source);
+                 //ahbCAN_pintError(busId);
+                 
+                 //status_send=ahbAddSendMsgQueue(AHB_PKGTYPE_UNICAST, AHB_CMD_F_NMT_PONG, pkg.meta.source, pkg.meta.port, _nodeId, sizeof(data), data, pkg.meta.busId);
+              }
+               
+              if (_nodeType==Master){
+                _master->NodeGuard_OK[pkg.meta.source][1] = true; //Статус узла Заполняем двумерный массив где [Node ID][Live status]
+                _master->NodeGuard_OK[pkg.meta.source][2]=true;
+                //Заполняем полученый UPTIME от узлов                
+                _master->ut_rn[pkg.meta.source][0]=pkg.data[0];
+                _master->ut_rn[pkg.meta.source][1]=pkg.data[1];
+                _master->ut_rn[pkg.meta.source][2]=pkg.data[2];
+                _master->ut_rn[pkg.meta.source][3]=pkg.data[3];
+                _master->ut_rn[pkg.meta.source][4]=pkg.data[4];
+                _master->ut_rn[pkg.meta.source][5]=pkg.data[5];
+                Serial.print(F("Receive HEARTBEAT from Node - ")); Serial.println(pkg.meta.source);    
+              }
+              
+              if (_nodeType==Slave){
+                if (pkg.meta.source!=4){
+                 _slave->NodeGuard_OK[pkg.meta.source][1] = true; //Статус узла Заполняем двумерный массив где [Node ID][Live status]
+                 _slave->NodeGuard_OK[pkg.meta.source][2]=true;
+                 //Заполняем полученый UPTIME от узлов                
+                 _slave->ut_rn[pkg.meta.source][0]=pkg.data[0];
+                 _slave->ut_rn[pkg.meta.source][1]=pkg.data[1];
+                 _slave->ut_rn[pkg.meta.source][2]=pkg.data[2];
+                 _slave->ut_rn[pkg.meta.source][3]=pkg.data[3];
+                 _slave->ut_rn[pkg.meta.source][4]=pkg.data[4];
+                 _slave->ut_rn[pkg.meta.source][5]=pkg.data[5];
+                Serial.print(F("Receive HEARTBEAT from Node - ")); Serial.println(pkg.meta.source); 
+                } 
+                else
+                 { //Если от мастера устанавливаем время
+                  hh_hw        = pkg.data[0];
+                  mm_hw        = pkg.data[1];
+                  ss_hw        = pkg.data[2];
+                  dd_hw        = pkg.data[3];
+                  month_hw     = pkg.data[4];
+                  year_hw      = pkg.data[5];
+                  dayOfWeek_hw = pkg.data[6];            
+                 }   
+              }
+              break;
+            }
+            
            default:{
                        
               break;
@@ -1067,15 +1228,15 @@ bool AHB::ahbAddSendMsgQueue(uint8_t type, uint8_t cmd, uint8_t target, uint8_t 
                 Message_TX_cell[i][13]=data[7];
                 Message_TX_cell[i][14]=busId;
                 #ifdef AHB_DEBUG
-                Serial.print(F("TX Message add to Queue. Target - "));Serial.print(target);
-                Serial.print(F(" Bus - ")); Serial.println(busId);
+                    Serial.print(F("TX Message add to Queue. Target - "));Serial.print(target);
+                    Serial.print(F(" Bus - ")); Serial.println(busId);
                 #endif //AHB_DEBUG
                 return true; //Сообщение добавлено в очередь  
             }            
         } 
         #ifdef AHB_DEBUG
-        Serial.print(F("TX Queue FULL!!!! Message do not add to Queue. Target - "));Serial.print(target);
-        Serial.print(F(" Bus - ")); Serial.println(busId);
+            Serial.print(F("TX Queue FULL!!!! Message do not add to Queue. Target - "));Serial.print(target);
+            Serial.print(F(" Bus - ")); Serial.println(busId);
         #endif // AHB_DEBUG
         return false; //Очередь переполнена. Сообщение НЕ добавлено в очередь
 } 
@@ -1095,14 +1256,15 @@ byte AHB::ahbSendMsgQueue(){
                 data[5]=Message_TX_cell[i][11];
                 data[6]=Message_TX_cell[i][12];
                 data[7]=Message_TX_cell[i][13];
-                if (curMicros-prevTimeSndMsgQueue>10000){
+                if (curMicros-prevTimeSndMsgQueue>10000){ 
+                 //Serial.println(F("TX Message send begin"));
                   state = _busAddr[Message_TX_cell[i][14]]->ahbSend_V(Message_TX_cell[i][0], Message_TX_cell[i][1], Message_TX_cell[i][2],  Message_TX_cell[i][3], Message_TX_cell[i][4], Message_TX_cell[i][5], data);
                   prevTimeSndMsgQueue=curMicros;
                 }
                 if (state) {
                     #ifdef AHB_DEBUG
-                    Serial.print(F("TX Message send from Queue . Target - "));Serial.print(Message_TX_cell[i][2]);
-                    Serial.print(F(" Bus - ")); Serial.println(Message_TX_cell[i][7]);
+                        Serial.print(F("TX Message send from Queue . Target - "));Serial.print(Message_TX_cell[i][2]);
+                        Serial.print(F(" Bus - ")); Serial.println(Message_TX_cell[i][7]);
                     #endif //AHB_DEBUG
                     Message_TX_cell[i][0]=0;
                     Message_TX_cell[i][1]=0;
@@ -1123,8 +1285,10 @@ byte AHB::ahbSendMsgQueue(){
                 }
                 else {
                    #ifdef AHB_DEBUG
-                   Serial.print(F("TX Message NOT send from Queue . Target - "));Serial.print(Message_TX_cell[i][2]);
-                   Serial.print(F(" Bus - ")); Serial.println(Message_TX_cell[i][7]);
+                      Serial.print(F("TX Message NOT send from Queue . Target - "));
+                      Serial.print(Message_TX_cell[i][2]);
+                      Serial.print(F(" Bus - ")); 
+                      Serial.println(Message_TX_cell[i][7]);
                    #endif //AHB_DEBUG
                    return false;
                 }
@@ -1136,6 +1300,178 @@ byte AHB::ahbSendMsgQueue(){
 
 bool AHB::ahbAddRcvMsgQueue(ahbPacket &pkg){ // Очередь приема команд
 
+}
+
+
+void AHB::ahbHeartbeat(uint8_t bus_Type){
+      //uint8_t master_interval;
+      bool state =false;
+      uint8_t CMD = AHB_CMD_F_NMT_HEARTBEAT; 
+      uint8_t CMDSlave = AHB_CMD_F_NMT_HEARTBEAT_TO_SLAVE;
+
+//Для мастера сделать таймер intervalHeartbeat*2 с обновлением
+
+ if  (curMillis-prevTimeHeartbeatMaster > (intervalHeartbeat*1000*10+_nodeId*100)){
+  for(signed char busId=0; busId<AHB_BUSNUM; busId++) {
+    if(_busAddr[busId] != 0x00&&_busAddr[busId]->busType()==bus_Type) {
+    
+      if (_nodeType==Master){
+      
+            for (int i=0; i<_busAddr[busId]->net_size_get();i++){
+              if (_busAddr[busId]->address_network_get(i)!=0){ //Если адрес в таблице маршрутов
+                _master->NodeGuard_OK[_busAddr[busId]->address_network_get(i)][0] = true; //Добавляем в табл нодегуард
+                if (_master->NodeGuard_OK[_busAddr[busId]->address_network_get(i)][2]==false){
+                  _master->NodeGuard_OK[_busAddr[busId]->address_network_get(i)][1]=false; //Сброс статуса узла
+                }
+                _master->NodeGuard_OK[_busAddr[busId]->address_network_get(i)][2]=false; //Дает нам возможность удвоить цикл проверки
+              }
+            }  
+      }
+      if (_nodeType==Slave){
+      
+            for (int i=0; i<_busAddr[busId]->net_size_get();i++){
+              if (_busAddr[busId]->address_network_get(i)!=0){ //Если адрес в таблице маршрутов
+                _slave->NodeGuard_OK[_busAddr[busId]->address_network_get(i)][0] = true; //Добавляем в табл нодегуард
+                if (_slave->NodeGuard_OK[_busAddr[busId]->address_network_get(i)][2]==false){
+                  _slave->NodeGuard_OK[_busAddr[busId]->address_network_get(i)][1]=false; //Сброс статуса узла
+                }
+                _slave->NodeGuard_OK[_busAddr[busId]->address_network_get(i)][2]=false; //Дает нам возможность удвоить цикл проверки
+              }
+            }  
+      }     
+      
+    }
+  }
+  prevTimeHeartbeatMaster = curMillis;
+ }  
+
+     
+  if  (curMillis-prevTimeHeartbeat > (intervalHeartbeat*1000+_nodeId*100)){
+    for(signed char busId=0; busId<AHB_BUSNUM; busId++) {
+      if(_busAddr[busId] != 0x00&&_busAddr[busId]->busType()==bus_Type) {
+        if (_nodeType==Master){
+      
+         //Отправляем аппаратное время мастера
+         byte data[7] = {hh_hw, mm_hw, ss_hw, dd_hw, month_hw, year_hw, dayOfWeek_hw};
+         //Добавим в очередь
+          ///state=ahbAddSendMsgQueue(0, CMD, 0, 0, _nodeId, sizeof(data),data , busId); 
+          state = _busAddr[busId]->ahbSend_V(0, CMD, 0,  0, _nodeId, sizeof(data), data);
+          ahbCAN_pintError(busId);
+          //#ifdef AHB_DEBUG
+            Serial.print(F("Generate Heartbeat Master - "));Serial.print(_nodeId); 
+            Serial.print(F(" / TX status - ")); Serial.println(state);            
+          //#endif ///AHB_DEBUG
+         
+          //UP TIME для Slave
+          byte data2[6] = {dd_ut,hh_ut, mm_ut, ss_ut,_busAddr[busId]->errorCountRX(),_busAddr[busId]->errorCountTX()};
+          state = _busAddr[busId]->ahbSend_V(1, CMDSlave, 5,  0, _nodeId, sizeof(data2), data2);
+          //#ifdef AHB_DEBUG
+            Serial.print(F("Generate Heartbeat Master For Slave - "));Serial.println(_nodeId);
+          //#endif ///AHB_DEBUG
+        }
+      
+        if (_nodeType==Slave){
+      
+         //Serial.print(F("Generate Heartbeat Slave - ")); Serial.println(_nodeId); 
+         //Отправляем свой UP_Time
+         byte data[6] = {dd_ut,hh_ut, mm_ut, ss_ut,_busAddr[busId]->errorCountRX(),_busAddr[busId]->errorCountTX()};
+         //Добавим в очередь
+         /////state = ahbAddSendMsgQueue(0, CMD, 0, 0, _nodeId, sizeof(data),data , busId); 
+         state = _busAddr[busId]->ahbSend_V(0, CMD, 0,  0, _nodeId, sizeof(data), data);
+        } 
+      
+        if (_nodeType==Node){
+         
+         //Отправляем свой UP_Time
+         byte data[6] = {dd_ut,hh_ut, mm_ut, ss_ut,_busAddr[busId]->errorCountRX(),_busAddr[busId]->errorCountTX()};
+         //Добавим в очередь
+         /////state = ahbAddSendMsgQueue(0, CMD, 0, 0, _nodeId, sizeof(data),data , busId); 
+         state = _busAddr[busId]->ahbSend_V(0, CMD, 0,  0, _nodeId, sizeof(data), data);
+         ahbCAN_pintError(busId);
+         //#ifdef AHB_DEBUG
+          Serial.print(F("Generate Heartbeat Node - ")); Serial.print(_nodeId); 
+          Serial.print(F(" / TX status - ")); Serial.println(state);    
+         //#endif ///AHB_DEBUG
+        }    
+      }
+    }
+    prevTimeHeartbeat = curMillis;
+  }
+}
+
+void AHB::ahbCAN_pintError(signed char busId) {
+  uint32_t EFLG_ERROR;
+  //Serial.print(F("errorCountRX - "));
+  //Serial.print(_busAddr[busId]->errorCountRX());
+  //Serial.print(F(" / errorCountTX - "));
+  //Serial.print(_busAddr[busId]->errorCountTX());
+  //Serial.print(F(" / checkError - "));
+  //Serial.print(_busAddr[busId]->checkError());
+  //Serial.print(F(" / getError - "));
+  EFLG_ERROR=_busAddr[busId]->getError();
+  //Serial.println(EFLG_ERROR);
+  //Serial.print(F(""));Serial.print((EFLG_ERROR >> 7) & 1);
+  //Serial.print(F(" | "));Serial.print((EFLG_ERROR >> 6) & 1);
+  //Serial.print(F(" | "));Serial.print((EFLG_ERROR >> 5) & 1);
+  //Serial.print(F(" | "));Serial.print((EFLG_ERROR >> 4) & 1);
+  //Serial.print(F(" | "));Serial.print((EFLG_ERROR >> 3) & 1);
+  //Serial.print(F(" | "));Serial.print((EFLG_ERROR >> 2) & 1);
+  //Serial.print(F(" | "));Serial.print((EFLG_ERROR >> 1) & 1);
+  //Serial.print(F(" | "));Serial.print((EFLG_ERROR >> 0) & 1);
+  //Serial.println("");
+  if (_nodeType==Master){
+    _master->ut_rn[_nodeId][4]=_busAddr[busId]->errorCountRX(); //Добавим RX Error для WEB
+    _master->ut_rn[_nodeId][5]=_busAddr[busId]->errorCountTX(); //Добавим TX Error для WEB
+  }
+#ifdef AHB_DEBUG  
+  if ((EFLG_ERROR >> 7) & 1) 
+    {Serial.println(F("ERROR - буфер приема 1 переполнен"));} 
+  else 
+    {Serial.println(F("OK - буфер приема 1 в норме"));}
+  if ((EFLG_ERROR >> 6) & 1) 
+    {Serial.println(F("ERROR - буфер приема 0 переполнен"));} 
+  else 
+    {Serial.println(F("OK - буфер приема 0 в норме"));}
+  if ((EFLG_ERROR >> 5) & 1) 
+    {Serial.println(F("ERROR - шина отключена"));} 
+  else 
+    {Serial.println(F("OK - шина в норме"));}
+  if ((EFLG_ERROR >> 4) & 1) 
+    {Serial.print(F("ERROR - пассивная ошибка передачи, ошибок - "));
+    Serial.println(_busAddr[busId]->errorCountTX());} 
+  else 
+    {Serial.println(F("OK - нет пассивной ошибки передачи"));}
+  if ((EFLG_ERROR >> 3) & 1) 
+    {Serial.print(F("ERROR - пассивная ошибка приема, ошибок - ")); 
+    Serial.println(_busAddr[busId]->errorCountRX());} 
+  else 
+    {Serial.println(F("OK - нет пассивной ошибки приема"));}
+  if ((EFLG_ERROR >> 2) & 1) 
+    {Serial.print(F("ERROR - предпреждение о ошибке передачи, ошибок - "));
+    Serial.println(_busAddr[busId]->errorCountTX());} 
+  else 
+    {Serial.println(F("OK - нет предпреждения о ошибке передачи"));}
+  if ((EFLG_ERROR >> 1) & 1) 
+    {Serial.print(F("ERROR - предпреждение о ошибке приема, ошибок - ")); 
+    Serial.println(_busAddr[busId]->errorCountRX());} 
+  else 
+    {Serial.println(F("OK - нет предпреждения о ошибке приема"));}
+  if ((EFLG_ERROR >> 0) & 1) 
+    {Serial.println(F("ERROR - предупреждение об ошибке"));} 
+  else 
+    {Serial.println(F("OK - нет предупреждения об ошибке"));}
+
+#endif
+
+  //7 RX1OVR Receive Buffer 1 Overflow Flag Bit  бит флага переполнения буфера приема 1
+  //6 RX0OVR Receive Buffer 0 Overflow Flag Bit  бит флага переполнения буфера приема 0
+  //5 TXBO   Bus-Off Error Flag Bit              бит флага ошибки отключения шины
+  //4 TXEP   Transmit Error-Passive Flag Bit     бит флага пассивной ошибки передачи  
+  //3 RXEP   Receive Error-Passive Flag Bit      бит флага пассивной ошибки приема
+  //2 TXWAR  Transmit Error Warning Flag Bit     бит флага предупреждения об ошибке передачи
+  //1 RXWAR  Receive Error Warning Flag Bit      бит флага предупреждения об ошибке приема
+  //0 EWARN  Error Warning Flag Bit              бит флага предупреждения об ошибке
+  
 }
 
 void AHB::ahbNodeGuard(uint8_t bus_Type) {
@@ -1152,7 +1488,7 @@ void AHB::ahbNodeGuard(uint8_t bus_Type) {
                   for (int i=0; i<_busAddr[busId]->net_size_get();i++){ 
                        //смотрим есть ли target в таблице маршрутов, игнорируем 0 не по адресу 0
                      if (_busAddr[busId]->address_network_get(i)!=0){                         
-                        NodeGuard_OK[_busAddr[busId]->address_network_get(i)][0] = true; //Наличие в таблице маршрутов
+                        _master->NodeGuard_OK[_busAddr[busId]->address_network_get(i)][0] = true; //Наличие в таблице маршрутов
 
                         //Добавим в очередь
                         state=ahbAddSendMsgQueue(1, CMD, _busAddr[busId]->address_network_get(i), 0, _nodeId, sizeof(data),data , busId);
@@ -1160,18 +1496,12 @@ void AHB::ahbNodeGuard(uint8_t bus_Type) {
                         if (!state) {
                           //  state=ahbAddSendMsgQueue(1, CMD, _busAddr[busId]->address_network_get(i), 0, _nodeId, sizeof(data),data , busId);
                             ahbSendMsgQueue();
-                            ahbAddSendMsgQueue(1, CMD, _busAddr[busId]->address_network_get(i), 0, _nodeId, 1,data , busId);
+                            ahbAddSendMsgQueue(1, CMD, _busAddr[busId]->address_network_get(i), 0, _nodeId, sizeof(data), data , busId); 
+                            ///1 или sizeof(data) ahbAddSendMsgQueue(1, CMD, _busAddr[busId]->address_network_get(i), 0, _nodeId, 1, data , busId);
                         }
-                        NodeGuard_OK[i][1]=false; //Статус узла
+                        _master->NodeGuard_OK[i][1]=false; //Статус узла
                      }
-                  }  
-                  
-                  //int i;
-                  //i=num_node_loop;
-                  //state=ahbSend(1, CMD, _busAddr[busId]->address_network_get(i), 0, _nodeId, sizeof(data),data);
-                  //num_node_loop++;
-                  //if (num_node_loop>_busAddr[busId]->net_size_get()) {num_node_loop=0;}
-                  
+                  }                    
                }
             }
             prevTimeNodeGuard = curMillis;
@@ -1201,17 +1531,35 @@ void AHB::ahbNodeGuard(uint8_t bus_Type) {
 
 void AHB::ahbNodeGuard_print(void) {
       if  (curMillis-prevTimeNodeGuard_print > intervalNodeGuard_print*1000) {
-          //Serial.println(F("Node Guard"));
            for (int i=0; i<255;i++){ //Бежим по всему адресному пространству всей сети!!! 1-255, а не конкретной CAN сети
-                if (NodeGuard_OK[i][0]){ //Наличие узла в таблице маршрутов
-                    Serial.print(F("Node - "));Serial.print(i); 
-                    if (NodeGuard_OK[i][1]) { //Статус узла
+              if (_nodeType==Master){
+                 if (_master->NodeGuard_OK[i][0]){ //Наличие узла в таблице маршрутов
+                    Serial.print(F("Node - "));
+                    Serial.print(i); 
+                    
+                    if (_master->NodeGuard_OK[i][1]) { //Статус узла
                         Serial.println(F(" is - OK"));
                     }
                     else {
                         Serial.println(F(" is - "));
                     }
-                }
+                    //_master->NodeGuard_OK[i][1]=false; //Статус узла
+                 }
+              }
+              if (_nodeType==Slave){
+                 if (_slave->NodeGuard_OK[i][0]){ //Наличие узла в таблице маршрутов
+                    Serial.print(F("Node - "));
+                    Serial.print(i); 
+                    
+                    if (_slave->NodeGuard_OK[i][1]) { //Статус узла
+                        Serial.println(F(" is - OK"));
+                    }
+                    else {
+                        Serial.println(F(" is - "));
+                    }
+                    //_master->NodeGuard_OK[i][1]=false; //Статус узла
+                 }              
+              }
            }
            prevTimeNodeGuard_print = curMillis;
       }
@@ -1219,22 +1567,13 @@ void AHB::ahbNodeGuard_print(void) {
 
 
 ahbPacket AHB::loop(void) {
+
         WTD();
         byte i;
         curMillis = millis(); // print system time
         curMicros = micros();
         ahbPacket pkg;
-        
-        // здесь основной код протокола NMT etc провереа флагов
 
-        //Packet handling
-        //This only receives a single packet. We could loop here, but doing it this way 
-        //allows the user code to still somewhat execute in environments with a lot of messages…
-        ahbReceive(pkg);
-        if (_nodeType==Master){
-          ahbNodeGuard(type_CAN); 
-          ahbNodeGuard_print();
-        }
         //Modules
         for(i=0; i<AHB_MODNUM; i++) {
             if(_module[i] != NULL) {
@@ -1242,12 +1581,29 @@ ahbPacket AHB::loop(void) {
             }
         }
         
-        //Отправка очереди ahbSendMsgQueue()
-        ahbSendMsgQueue();
-        
         system_uptime(); //Подсчет Up Time
         
-
+        ahbReceive(pkg); //Прием сообщений
+        
+        
+             
+        if (_nodeType==Master){   //Мастер
+          //ahbNodeGuard(type_CAN); //NodeGuard Формирование запросов к узлам //ahbAddSendMsgQueue запросы к узлам
+          ahbHeartbeat(type_CAN); //Heartbeat Формирование запросов к узлам //ahbAddSendMsgQueue запросы к узлам
+          ahbNodeGuard_print();   //Вывод состояния узлов 
+        }
+        if (_nodeType==Slave){   //Слейв
+          //ahbNodeGuard(type_CAN); //NodeGuard Формирование запросов к узлам //ahbAddSendMsgQueue запросы к узлам
+          ahbHeartbeat(type_CAN); //Heartbeat Формирование запросов к узлам //ahbAddSendMsgQueue запросы к узлам
+          ahbNodeGuard_print();   //Вывод состояния узлов 
+        }        
+        if (_nodeType==Node){   //Слейв
+          ahbHeartbeat(type_CAN);
+          //_node->WTD_node(curMillis);
+        }
+        
+        //ahbSendMsgQueue(); //Отправка очереди ahbSendMsgQueue()
+    
         
         
         //SetAlarm(0, &errorStateBlink, 62, 62);       
@@ -1262,7 +1618,6 @@ ahbPacket AHB::loop(void) {
         //ahbSync(_nodeType);
         //ahbEmcy(_nodeType);
 
-        
         return pkg;
 }
 
@@ -1271,66 +1626,3 @@ ahbPacket AHB::loop(void) {
 //void AHB::ahbTimers() {}
 
 #endif /* AHB__C */
-
-/**
-byte AHB::ahbSend_M(byte type, unsigned int target, unsigned int source, char port, byte len, byte data[8], uint8_t busType,signed char skip) { //8
-
-        bool state;
-        byte errors=0,i;
-        if(source == 0) source = _nodeId;
-
-        //Здесь полная хуйня, пакет отправляется во все сети перебирая все интерфейсы. 
-        //Внутри я уже проверяю тип, далее проверяем маршруты
-        //А вот надо ли заранее передавать тип интерфейса?        
-       //Откуда я знаю заранее какой адрес какого типа.       
-       //Нужно с типом оставить но ваять новый код      
-       //!!! есть два слоя AHB::AHB это софт слой и AHB::AHB_COMM это хард слой с железом
-       //1.AHB::AHB в этом слое работает сложный роутинг и выбор типа интерфейса и протокола зависит от таблиц маршрутизации
-       //2.AHB::AHB_COMM (AHB_CAN, AHB_UART, AHB_MODBUS_RTU) здесь все более хардово, выбор типа протокола и пр.
-       //3.AHB_CAN и пр. здесь без выбора типа (уже определен классом, но полный доступ к железу)
-       //Причем нас интереует ??? ТХ в основном, по RX думаем.
-               
-        for(signed char busId=0; busId<AHB_BUSNUM; busId++) {
-          //Нужно переделать фильтр не на пропускает а куда кидать
-          if (_busAddr[busId] != 0x00){
-            for (int i=0; i<255;i++){
-              if (_busAddr[busId]->address_network_get(i)==target&&_busAddr[busId]->address_network_get(i)!=0){
-              Serial.print(F("@@@ TX target Addr in my network type - "));
-              Serial.print(_busAddr[busId]->busType());
-              Serial.print(F(" - is - "));
-              Serial.println(_busAddr[busId]->address_network_get(i));
-              }
-            }
-            
-            if( _busAddr[busId]->busType()==busType){ //если шина CAN то кидаем в нее, нудно еще проверять на принадлежность сети
-          
-              Serial.print(F("@@@ TX SEND TO BUS - "));Serial.println(_busAddr[busId]->busType());
-              //Skip не пропускает сам на себя из ресива но кидает во все шины а это ХРЕНЬ!!!!!
-              if(_busAddr[busId] != 0x00 && busId != skip) {
-                state = _busAddr[busId]->ahbSend_V(type, 0, target,  port, source, len, data);
-                if(!state) errors++;
-              }
-              
-            }
-            
-            
-          }
-        }
-        
-        //Skip не пропускает сам на себя из ресива
-        if(skip < 0) {
-            //Local source, check for actions
-            ahbPacket pkg;
-            pkg.meta.type = type;
-            pkg.meta.target = target;
-            pkg.meta.source = source;
-            pkg.meta.port = port;
-            pkg.len = len;
-            for(i=0; i<len; i++) pkg.data[i] = data[i];
-
-            ahbProcess(pkg);
-        }
-        return errors;
-
-}
-*/
