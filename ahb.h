@@ -25,18 +25,16 @@
 
 #ifndef AHB__H
     #define AHB__H
-    
-    //#include "ahb_CO_canfestival.h"
-                   //#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-                   //
-                   //#endif 
-//    #include <DS3231.h>
     #include "Wire.h"  
-    #include <SPI.h>                 
-    #include "ahb_comm_template.h"
+    #include <SPI.h>        
+    #include "ahb_master.h" 
+    #include "ahb_slave.h" 
+    #include "ahb_node.h"     
+    #include "ahb_comm_template.h"   
     #include "ahb_proto.h"
     #include "ahb_hook.h"
 
+       
     #include "ahb_comm_CAN.h"
     #include "ahb_comm_UART.h"
     #include "ahb_comm_MODBUS_RTU.h"
@@ -49,7 +47,16 @@
     #include "ahb_eth.h"
     #include "ahb_WEB.h"
     
-    #include "ahb_timers.h"
+    #include "ahb_gw_can_to_udp.h"
+    #include "ahb_gw_can_to_okbit.h"
+    
+    
+    //#include "ahb_comm_okbit_udp.h"
+    
+    
+   // #include "ahb_timers.h"
+    
+
     
     #if defined  (__AVR__)
        #include <avr/wdt.h>
@@ -57,8 +64,16 @@
     
     //#include <stdint.h>  
 
-    
+    #if defined  (__AVR__)
+        #define AHB_EEPROM_USE //Arduino DUE not have EEPROM, set manual or use end sectors flash
+    #endif    
 
+    #ifdef AHB_EEPROM_USE
+      #include<EEPROM.h>
+    #endif    
+
+    
+    
     /**
      * Maximum number of parallel communication interfaces
      *
@@ -66,10 +81,6 @@
      * in one instance. You can set it to a integer between 1 and 120. Keep
      * in mind higher numbers will increase RAM and CPU usage. Default is 6.
      */
-     
-    #if defined  (__AVR__)
-        #define AHB_EEPROM_USE //Arduino DUE not have EEPROM, set manual or use end sectors flash
-    #endif     
      
     #ifndef AHB_BUSNUM
         #define AHB_BUSNUM 6 //<120!
@@ -109,7 +120,7 @@
     * Set parametr for HW Clock DS3231
     */   
     #ifndef DS3231_I2C_ADDRESS
-        #define DS3231_I2C_ADDRESS           0x68
+        #define DS3231_I2C_ADDRESS          (0x68)
         #define DS3231_REG_TIME             (0x00)
         #define DS3231_REG_ALARM_1          (0x07)
         #define DS3231_REG_ALARM_2          (0x0B)
@@ -120,12 +131,15 @@
 
 typedef enum enum_busType {
                 type_null_bus,
+                type_GW_CAN_TO_UDP,
+                type_GW_CAN_TO_OKBIT,
                 type_CAN,
                 type_UART,
                 type_MQTT,
                 type_MODBUS_RTU,
                 type_MODBUS_TCP,
                 type_TCP
+                
 } enum_busTYPE;
     
      /**
@@ -145,19 +159,25 @@ typedef enum enum_nodeType {
      * different communication interfaces, implements basic functions like
      * sending boot messages, answering to PING and allows for attaching your
      * own functions to various messages
-     */   
+     */    
 
+//void ahb_RXInt(void);
 
-     
+class AHB_MASTER;
+class AHB_SLAVE;
+class AHB_NODE;
+
 class AHB {
         private:    
-       
-            //TwoWire _wire; 
-        
+               
+            AHB_MASTER *_master;
+            
+            AHB_SLAVE *_slave;
+            
+            AHB_NODE *_node;
             /**
              * Array of pointers to active communication interfaces
              */
-           
             AHB_COMM *_busAddr[AHB_BUSNUM];
 
             /**
@@ -171,11 +191,6 @@ class AHB {
             AHB_IO *_module[AHB_MODNUM];
 
             /**
-             * Bus address of this node
-             */
-            //unsigned int _nodeId=0; //перенес в public
-
-            /**
              * First EEPROM address to use
              */
             unsigned int _cfgAddrStart=0;
@@ -183,14 +198,7 @@ class AHB {
             /**
              * Last EEPROM address to use
              */
-            unsigned int _cfgAddrStop=511;
-            /**
-             * Node Type 
-             * master_node        main master node
-             * slave_master_node  slave master node
-             * slave_node         slave node
-             */            
-            //uint8_t _nodeType=0; //в паблик
+            unsigned int _cfgAddrStop=511;           
 
             /**
              Массив ячеек очереди сообщений, в которой хранятся сообщения на отправку
@@ -201,14 +209,24 @@ class AHB {
             
             unsigned long prevTimeNodeGuard = 0; //для таймера NodeGuard
             
+            unsigned long prevTimeHeartbeat = 0; //для таймера Heartbeat
+            
+            unsigned long prevTimeHeartbeatMaster = 0; //для таймера Heartbeat
+            
             unsigned long prevTimeNodeGuard_print = 0; //для таймера NodeGuard
             
             unsigned long curMillis = 0; //снимок машинного времени
+            
             unsigned long curMicros = 0;
             
-            const byte intervalNodeGuard = 5; // интервал таймера NodeGuard
-            const byte intervalNodeGuard_print = 12; // интервал таймера NodeGuard
-            unsigned long prevTimeSndMsgQueue = 0; //для таймера NodeGuard
+            const byte intervalNodeGuard = 10; // интервал таймера NodeGuard
+            
+            const byte intervalHeartbeat = 1; // интервал таймера Heartbeat
+            
+            const byte intervalNodeGuard_print = 10; // интервал таймера NodeGuard
+            
+            unsigned long prevTimeSndMsgQueue = 10; //для таймера NodeGuard
+            
             int num_node_loop=0;
             
             /**
@@ -252,6 +270,7 @@ class AHB {
             //void watchdogSetup (void);
             
             uint32_t status_wdt;
+            
             /**
             * Watch dog timer
             */
@@ -266,46 +285,65 @@ class AHB {
             * Watch dog 1 enable/ 0 disable
             */            
             bool WTD_set(bool set_wdt); 
+            
+            signed char busId_GW_CAN_TO_UDP = -1;
+            
+            signed char busId_GW_CAN_TO_OKBIT = -1;
 
             
         public:
             
-            bool NodeGuard_OK[255][2] = {{ 0 }};
-            
-/**У мастера и слейва есть        
-1. Аппаратные часы храним xx_hw их значение передаем в PING
-2. Up_time часы храним в xx_ut для получения своего время жизни
-3. Up_time удаленных узлов их храним в xx_ut_rn
-*/
+            bool NodeGuard_OK_check (uint8_t a, uint8_t b);
 
-/** У узлов нет аппаратных часов но их мы заменяем рассылкой в PING от мастера и слейва
-1. PING от аппаратных часов мастера их храним в xx_hw, !!!!!! не забыть их крутить пока не пришел новый PING
-2. Up_time часы храним в xx_ut для получения своего время жизни
-3. Up_time удаленных узлов !!!!!!!!!!!!!НУЖНО очистить память они не нужны
-*/
-// Системные часы если есть аппаратный контроллер
-uint8_t ss_hw = 0;
-uint8_t mm_hw = 0;
-uint8_t hh_hw = 0;
-uint8_t dd_hw = 0;
-uint8_t dayOfWeek_hw = 0;
-uint8_t month_hw = 0;
-byte    year_hw = 0;
-byte    temp_hw = 0;
+            /*
+            Массив со статусами удаленных узлов. Заполняется на основе ответов
+            */
+            //bool NodeGuard_OK[255][3] = {{ 0 }}; //[2]
+ 
+            /**
+             * Node Type 
+             * Master       master node
+             * Slave        slave node
+             * Node         node
+             */                
+           uint8_t _nodeType; //лучше в приваты и выдавать через функцию, хотя может стоит 
+                              //и на лету менять тип узла из приложения????
+
+            /**
+             * Bus address of this node
+             */
+           uint8_t _nodeId=0;      
+           
+           /* У мастера и слейва есть        
+           1. Аппаратные часы храним xx_hw их значение передаем в PING
+           2. Up_time часы храним в xx_ut для получения своего время жизни
+           3. Up_time удаленных узлов их храним в xx_ut_rn
+           */
+
+            /* У узлов нет аппаратных часов но их мы заменяем рассылкой в PING от мастера и слейва
+            1. PING от аппаратных часов мастера их храним в xx_hw, !!!!!! не забыть их крутить пока не пришел новый PING
+            2. Up_time часы храним в xx_ut для получения своего время жизни
+            3. Up_time удаленных узлов !!!!!!!!!!!!!НУЖНО очистить память они не нужны
+            */
+            // Системные часы если есть аппаратный контроллер
+            uint8_t ss_hw = 0;
+            uint8_t mm_hw = 0;
+            uint8_t hh_hw = 0;
+            uint8_t dd_hw = 0;
+            uint8_t dayOfWeek_hw = 0;
+            uint8_t month_hw = 0;
+            byte    year_hw = 0;
+            byte    temp_hw = 0;
         
-// Up Time my node системные часы на миллис 
-uint8_t ss_ut = 0;
-uint8_t mm_ut = 0;
-uint8_t hh_ut = 0;
-uint8_t dd_ut = 0;
-uint32_t prevSystemtime_ut = 0;
+           // Up Time my node - системные часы на миллис 
+           uint8_t ss_ut = 0;
+           uint8_t mm_ut = 0;
+           uint8_t hh_ut = 0;
+           uint8_t dd_ut = 0;
+           uint32_t prevSystemtime_ut = 0;
 
-// Up Time remote node
-uint8_t cc_ut_rn[256];// = 0;
-uint8_t ss_ut_rn[256];// = 0;
-uint8_t mm_ut_rn[256];// = 0;
-uint8_t hh_ut_rn[256];// = 0;
-uint8_t dd_ut_rn[256];// = 0;                                  
+           // Up Time remote node 
+           //uint8_t ut_rn[256][6];           
 
            uint8_t print_ss_ut(void);
            uint8_t print_mm_ut(void);
@@ -319,17 +357,14 @@ uint8_t dd_ut_rn[256];// = 0;
            uint8_t print_month_hw(void);
            uint8_t print_year_hw(void);
            uint8_t print_dayofweak_hw(void);
+
+           uint8_t print_tx_error_rn(uint8_t i);
+           uint8_t print_rx_error_rn(uint8_t i);   
            
            uint8_t print_ss_rn(uint8_t i);
            uint8_t print_mm_rn(uint8_t i);
            uint8_t print_hh_rn(uint8_t i);
-           uint8_t print_dd_rn(uint8_t i);
-           
-
-  
-           uint8_t _nodeType; //лучше в приваты и выдавать через функцию, хотя может стоит и на лету менять тип узла из приложения????
-
-           uint8_t _nodeId=0;
+           uint8_t print_dd_rn(uint8_t i);         
         
             /**
              * Constructor reads configuration
@@ -356,7 +391,7 @@ uint8_t dd_ut_rn[256];// = 0;
              * @param function to execute
              * @return true if initialized
              */
-            bool firstboot(void (*function)());
+            bool firstboot(void (*function)(), bool manual);
 
             /**
              * Change Node-ID
@@ -371,6 +406,10 @@ uint8_t dd_ut_rn[256];// = 0;
              * @see busDetach()
              */
             char busAttach(AHB_COMM * bus);
+            
+            bool masterAttach(AHB_MASTER * mas);
+            bool slaveAttach(AHB_SLAVE * sla);
+            bool nodeAttach(AHB_NODE * nod);
             
             /**
              * Detach a bus-object from this controller
@@ -501,6 +540,10 @@ uint8_t dd_ut_rn[256];// = 0;
              * @return true if a message was received
              */
             bool ahbReceive(ahbPacket &pkg, bool routing);
+            
+            
+            bool ahbReceiveRouting(ahbPacket &pkg, uint8_t packet_state, signed char busId_route);
+            
 
             /**
              * Process incoming packet
@@ -572,6 +615,16 @@ uint8_t dd_ut_rn[256];// = 0;
             Опрос узлов сети PING
             */  
             void ahbNodeGuard(uint8_t bus_Type);
+ 
+            /**
+            Отправка своего состояния (Master выдает аппаратное время, Node - UpTime)
+            */  
+            void ahbHeartbeat(uint8_t bus_Type);
+            
+            /**
+            Печать ошибок CAN шины, занесение в таблицу Up time для отправки
+            */              
+            void ahbCAN_pintError(signed char busId);
             
             /**
             Вывод состояния ответов узлов сети на PING
@@ -589,32 +642,12 @@ uint8_t dd_ut_rn[256];// = 0;
             //void ahbTimers();
 };
 
+//class AHB_MASTER : public AHB {
+//public:
+//           AHB_MASTER(unsigned int start, unsigned int stop, uint8_t ndType):AHB(start,stop, ndType){}
+//           AHB_MASTER(uint8_t id, uint8_t ndType):AHB(id, ndType){}
+//           
+//};
+
+
 #endif /* AHB__H */
-
-            /* typedef enum enum_nodeState {
-                 Initialisation  = 0x00,  // 0:   'INITIALISING',    - +
-                 Disconnected    = 0x01,  // 1:   ''
-                 Connecting      = 0x02,  // 2:   ''
-                 Preparing       = 0x02,  // 3:   ''
-                 Stopped         = 0x04,  // 4:   'STOPPED',         - +
-                 Operational     = 0x05,  // 5:   'OPERATIONAL',     - + полный функционал
-                                          // 80:  'SLEEP',          -
-                                          // 96:  'STANDBY',        -
-                 Pre_operational = 0x7F,  // 127: 'PRE-OPERATIONAL'- + конфигурирование по SDO, PDO отключен???
-                 Unknown_state   = 0x0F   //
-            }e_nodeState;         
-
-            typedef struct {
-                 INTEGER8 csBoot_Up;
-                 INTEGER8 csSDO;
-                 INTEGER8 csEmergency;
-                 INTEGER8 csSYNC;
-                 INTEGER8 csLifeGuard;
-                 INTEGER8 csPDO;
-                 INTEGER8 csLSS;
-            } s_state_communication;
-            */ 
-            
-            /**
-             * Bus address of this node
-             */
