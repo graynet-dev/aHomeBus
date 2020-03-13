@@ -44,6 +44,7 @@ class AHB_MODBUS_RTU : public AHB_COMM {
             uint8_t modbus_rtu_request_sender;
             
         public:
+           void SetNodeId(uint8_t nodeId);
             /**
             * Pointer to ARRAY from user main app. Array send to consructor route_table
             * {1,2,10,22} etc.
