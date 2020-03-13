@@ -162,23 +162,25 @@ typedef enum enum_nodeType {
      */    
 
 //void ahb_RXInt(void);
-
-class AHB_MASTER;
-class AHB_SLAVE;
-class AHB_NODE;
+//class AHB_NODE;
+//class AHB_SLAVE;
+//class AHB_MASTER;
 
 class AHB {
         private:    
-               
-            AHB_MASTER *_master;
-            
+
+            AHB_MASTER *_master; 
             AHB_SLAVE *_slave;
-            
             AHB_NODE *_node;
+            AHB_NODE2 *_node2;  //Непонятная хрень, без этого указателя на пустой класс идет сбой nodeAttach          
+
             /**
              * Array of pointers to active communication interfaces
              */
             AHB_COMM *_busAddr[AHB_BUSNUM];
+
+
+              
 
             /**
              * Array of structs containing hooks
@@ -359,7 +361,9 @@ class AHB {
            uint8_t print_dayofweak_hw(void);
 
            uint8_t print_tx_error_rn(uint8_t i);
-           uint8_t print_rx_error_rn(uint8_t i);   
+           uint8_t print_rx_error_rn(uint8_t i);  
+          
+           uint8_t print_reboot(uint8_t i); 
            
            uint8_t print_ss_rn(uint8_t i);
            uint8_t print_mm_rn(uint8_t i);
@@ -405,11 +409,13 @@ class AHB {
              * @return bus-ID, -1 on errors
              * @see busDetach()
              */
-            char busAttach(AHB_COMM * bus);
+            char busAttach(AHB_COMM *bus);
             
-            bool masterAttach(AHB_MASTER * mas);
-            bool slaveAttach(AHB_SLAVE * sla);
-            bool nodeAttach(AHB_NODE * nod);
+            bool masterAttach(AHB_MASTER *mas);              
+            bool slaveAttach(AHB_SLAVE *sla);
+            bool nodeAttach(AHB_NODE *node);
+
+
             
             /**
              * Detach a bus-object from this controller
@@ -641,13 +647,5 @@ class AHB {
             */
             //void ahbTimers();
 };
-
-//class AHB_MASTER : public AHB {
-//public:
-//           AHB_MASTER(unsigned int start, unsigned int stop, uint8_t ndType):AHB(start,stop, ndType){}
-//           AHB_MASTER(uint8_t id, uint8_t ndType):AHB(id, ndType){}
-//           
-//};
-
 
 #endif /* AHB__H */
