@@ -1,12 +1,9 @@
-#ifndef AHB_NODE_C
-#define AHB_NODE_C
+//#ifndef AHB_NODE_C
+//#define AHB_NODE_C
+
     #include "ahb_node.h"
 
-AHB_NODE::AHB_NODE(uint8_t id){
-
-   void WTD_node(void);
-
-} 
+AHB_NODE::AHB_NODE(uint8_t id){} 
 
 void AHB_NODE::WTD_node(unsigned long millis_){
 
@@ -25,7 +22,8 @@ void AHB_NODE::WTD_node(unsigned long millis_){
           Serial.println(F("No receive Heartbeat from all, reboot node"));
            while(1){}
         }
+
 }
   
     
-#endif /* AHB_NODE_C */
+//#endif /* AHB_NODE_C */
