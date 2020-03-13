@@ -144,14 +144,6 @@ byte AHB::begin() {
               Serial.println(status_wdt, BIN);
           #endif //AHB_DEBUG
         #endif
-
-        
-        
-        if (_nodeType==Master){ //Игры с классами мастер
-         // AHB_MMO AHB_MMO_0;
-         // AHB_MMO_0.begin();
-         // _master->test();
-        }
 }
 
 void AHB::WTD(void){
@@ -238,10 +230,11 @@ bool AHB::slaveAttach(AHB_SLAVE *sla) {
   return true;
 }
 
-bool AHB::nodeAttach(AHB_NODE *nod) {
-  _node = nod;
+bool AHB::nodeAttach(AHB_NODE *node) {
+  _node = node;
   return true;
 }
+
 
 bool AHB::NodeGuard_OK_check (uint8_t a, uint8_t b){
   bool x;
@@ -602,6 +595,12 @@ uint8_t AHB::print_rx_error_rn(uint8_t i){
   if (_nodeType==Master) {return _master->ut_rn[i][4];}
   if (_nodeType==Slave) {return _slave->ut_rn[i][4];}
 }
+
+uint8_t AHB::print_reboot(uint8_t i){
+  if (_nodeType==Master) {return _master->ut_rn[i][6];}
+  if (_nodeType==Slave) {return _slave->ut_rn[i][6];}
+} 
+
 uint8_t AHB::print_ss_rn(uint8_t i){
   if (_nodeType==Master) {return _master->ut_rn[i][3];}
   if (_nodeType==Slave) {return _slave->ut_rn[i][3];}
@@ -832,12 +831,13 @@ bool AHB::ahbReceive(ahbPacket &pkg, bool routing) { //Нахуй роутинг
                    ReceiveBusType = _busAddr[busId]->busType();
                    //Отправка CAN по UDP на сервер
                    if (_busAddr[busId_GW_CAN_TO_UDP] != 0x00){
-                       Serial.println("CAN UDP");
+                       //Serial.println("CAN UDP");
                       _busAddr[busId_GW_CAN_TO_UDP]->ahbSend_V(pkg.meta.type, pkg.meta.cmd, pkg.meta.target,  pkg.meta.port, pkg.meta.source, sizeof(pkg.data), pkg.data);
                    }
                    //Отправка в Majordomo Okbit UDP
                    if (_busAddr[busId_GW_CAN_TO_OKBIT] != 0x00){
-                       Serial.println("CAN OKBIT");
+                       //Serial.println("CAN OKBIT");
+                      _busAddr[busId_GW_CAN_TO_OKBIT]->SetNodeId(_nodeId);
                       _busAddr[busId_GW_CAN_TO_OKBIT]->ahbSend_V(pkg.meta.type, pkg.meta.cmd, pkg.meta.target,  pkg.meta.port, pkg.meta.source, sizeof(pkg.data), pkg.data);
                    }                   
                    pkg.meta.busId = busId;
@@ -1044,6 +1044,18 @@ void AHB::ahbRxProcessingNode(ahbPacket &pkg){
         byte data[4] = {dd_ut,hh_ut, mm_ut, ss_ut}; //Отправляем свой UP_time мастеру или запросившему
         bool status_send = false;
         switch(pkg.meta.cmd) {
+            case AHB_CMD_F_NMT_BOOT:{
+              //Serial.println("receive AHB_CMD_F_NMT_BOOT---------------------------------------");
+              if (_nodeType==Master){
+                _master->ut_rn[pkg.meta.source][6]=_master->ut_rn[pkg.meta.source][6]+1;
+                //Serial.println(_master->ut_rn[pkg.meta.source][6]);
+              }
+              if (_nodeType==Slave){
+                _slave->ut_rn[pkg.meta.source][6]=_slave->ut_rn[pkg.meta.source][6]+1;
+                //Serial.println(_slave->ut_rn[pkg.meta.source][6]);
+              }              
+              break;
+            }
             case AHB_CMD_F_NMT_PING:{ //Если нам PING отвечаем PONG, если от мастера устанавливаем время
               if (_nodeType!=Master){
                  hh_hw        = pkg.data[0];
@@ -1111,7 +1123,7 @@ void AHB::ahbRxProcessingNode(ahbPacket &pkg){
             
             case AHB_CMD_F_NMT_HEARTBEAT:{ //Если нам HEARTBEAT, от мастера устанавливаем время
               if (_nodeType==Node){
-                 //_node->heartbeat_count++;
+                 _node->heartbeat_count++;
                  if (pkg.meta.source==4){ //Если от мастера устанавливаем время
                   hh_hw        = pkg.data[0];
                   mm_hw        = pkg.data[1];
@@ -1311,7 +1323,7 @@ void AHB::ahbHeartbeat(uint8_t bus_Type){
 
 //Для мастера сделать таймер intervalHeartbeat*2 с обновлением
 
- if  (curMillis-prevTimeHeartbeatMaster > (intervalHeartbeat*1000*10+_nodeId*100)){
+ if  (curMillis-prevTimeHeartbeatMaster > (intervalHeartbeat*1000*10+_nodeId*10)){
   for(signed char busId=0; busId<AHB_BUSNUM; busId++) {
     if(_busAddr[busId] != 0x00&&_busAddr[busId]->busType()==bus_Type) {
     
@@ -1599,7 +1611,7 @@ ahbPacket AHB::loop(void) {
         }        
         if (_nodeType==Node){   //Слейв
           ahbHeartbeat(type_CAN);
-          //_node->WTD_node(curMillis);
+          _node->WTD_node(curMillis);
         }
         
         //ahbSendMsgQueue(); //Отправка очереди ahbSendMsgQueue()
