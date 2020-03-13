@@ -43,6 +43,8 @@ void ahb_CANInt(void);
      * CAN Communication Interface
      * @see AHB_COMM
      */
+     
+
   
 class AHB_CAN : public AHB_COMM { // <net_size>
         private:
@@ -135,6 +137,7 @@ const byte timeoutsArray [3][2]= {
 #define TIMEOUT_  1
 */            
         public:
+        void SetNodeId(uint8_t nodeId);
             /**
             * Pointer to ARRAY from user main app. Array send to consructor route_table
             * {1,2,10,22} etc.
