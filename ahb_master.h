@@ -1,6 +1,6 @@
 #ifndef AHB_MASTER_H
 #define AHB_MASTER_H
-    #include "ahb.h"
+    //#include "ahb.h"
     #include "ahb_proto.h"
     
 class AHB_MASTER { //: public AHB_MCOMM
@@ -10,7 +10,7 @@ public:
             AHB_MASTER(uint8_t id); 
              
             // Up Time remote node 
-            uint8_t ut_rn[256][6];    
+            uint8_t ut_rn[256][7];    
 };
     
 #endif /* AHB_MASTER_H */
