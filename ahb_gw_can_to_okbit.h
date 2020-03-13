@@ -87,6 +87,7 @@ class AHB_GW_CAN_TO_OKBIT : public AHB_COMM {
             char replyGate[100];
             int gateIP[4];
             void debounce(void);
+            uint8_t _nodeId=0;
             
             
             /**
@@ -143,7 +144,8 @@ class AHB_GW_CAN_TO_OKBIT : public AHB_COMM {
             uint8_t errorCountTX(void); 
             uint8_t getError(void);
 
-
+            void SetNodeId(uint8_t nodeId);
+            
             bool ahbSend_V(uint8_t type, uint8_t cmd, uint8_t target, uint8_t port, uint8_t source,  uint8_t len, byte data[8]);
             /**
              * Receive a message from the CAN-bus
