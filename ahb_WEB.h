@@ -23,8 +23,22 @@ class AHB_WEB {
          void begin(void);
         
          bool webAttach(AHB *ahb);
+         
+         String HTTP_req;
+         
+         boolean gflag=false;
+         String parm;
+         int dout[8]={0,0,0,0,0,0,0,0};
         
          void loop_web();
+         
+         void loop_web2();
+         
+         void loop_web3();
+         
+         void loop_web4();
+         
+         void GetSwitchState(EthernetClient cl);
 };
 
 #endif
