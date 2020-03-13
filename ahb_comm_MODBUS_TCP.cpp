@@ -41,6 +41,8 @@ _interface(u8MBUnitID){
 
 } 
 
+void AHB_MODBUS_TCP::SetNodeId(uint8_t nodeId) {}
+
 byte AHB_MODBUS_TCP::begin() {
 //ModbusTCP node(1); 
 //node.setServerIPAddress(ModbusDeviceIP);
