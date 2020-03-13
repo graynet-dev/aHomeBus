@@ -40,6 +40,8 @@ void ahb_CANInt() {
     /*
      * @TODO communication without INT
      */
+
+     
 AHB_CAN::AHB_CAN(byte cs, byte speed, byte clockspd) : 
 _interface(cs){
         _speed = speed;
@@ -63,6 +65,8 @@ _interface(cs) {
         _speed = speed;
         _clockspd = clockspd;        
 }
+
+void AHB_CAN::SetNodeId(uint8_t nodeId) {}
 
 void AHB_CAN::mcp2515_reset(void){
         Serial.println("mcp2515_reset()");
