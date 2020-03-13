@@ -57,6 +57,7 @@ class AHB_UART : public AHB_COMM { //<net_size>
             bool bufShift(byte len);
 
         public:
+        void SetNodeId(uint8_t nodeId);
             /**
             * Pointer to ARRAY from user main app. Array send to consructor route_table
             * {1,2,10,22} etc.
