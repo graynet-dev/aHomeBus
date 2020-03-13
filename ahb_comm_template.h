@@ -31,7 +31,7 @@
      * Class defining the base functions for any communication interface
      * This is a template and can not be used by itself
      */
-//template <int net_size> 
+
 class AHB_COMM {
         public:
             /**
@@ -68,6 +68,8 @@ class AHB_COMM {
             virtual uint8_t errorCountRX(void);
             virtual uint8_t errorCountTX(void); 
             virtual uint8_t getError(void);
+            
+            virtual void SetNodeId(uint8_t nodeId);
 
 /**
 Заполнение очереди команд
