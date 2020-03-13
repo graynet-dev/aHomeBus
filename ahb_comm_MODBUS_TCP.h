@@ -38,6 +38,8 @@ class AHB_MODBUS_TCP : public AHB_COMM {
 
 
         public:
+           void SetNodeId(uint8_t nodeId);
+        
            uint8_t all_network_address[255]; //256
            
            uint8_t address_network_get(uint8_t i);
