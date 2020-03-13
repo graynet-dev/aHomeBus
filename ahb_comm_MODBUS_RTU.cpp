@@ -61,6 +61,8 @@ _interface(u8id,u8serno,u8txenpin){
        net_size = netsize;  
 }
 
+void AHB_MODBUS_RTU::SetNodeId(uint8_t nodeId) {}
+
 byte AHB_MODBUS_RTU::begin() {
      _interface.begin(9600); // baud-rate at 19200
      _interface.setTimeOut( 5000 ); // if there is no answer in 5000 ms, roll over
