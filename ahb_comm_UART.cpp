@@ -40,6 +40,7 @@ AHB_UART::AHB_UART(Stream &serial, uint8_t *route_table , uint8_t netsize) {
         net_size = netsize;  
 }
 
+void AHB_UART::SetNodeId(uint8_t nodeId) {}
 
 byte AHB_UART::begin() {
         return 0;
