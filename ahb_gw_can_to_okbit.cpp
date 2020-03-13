@@ -165,8 +165,8 @@ void AHB_GW_CAN_TO_OKBIT::parsing(char inPacket[255], int len, uint32_t gateIP) 
 
 
     if (this->in_cmd == 255 || this->in_cmd == 20) {
-     ///////////////////unsigned long mid = ESP.getChipId();
-     unsigned long mid = 1;
+     unsigned long mid = _nodeId; //ESP.getChipId();
+     //unsigned long mid = 1;
       unsigned int mid_b[2];
       mid_b[0] = mid >> 16;
       mid_b[1] = mid & 0xFFFF;
@@ -333,6 +333,7 @@ void AHB_GW_CAN_TO_OKBIT::holding_update() {
 }
 
 bool AHB_GW_CAN_TO_OKBIT::ahbSend_V(uint8_t type, uint8_t cmd, uint8_t target, uint8_t port, uint8_t source,  uint8_t len, byte data[8]){
+       
        uint32_t rxId = 0x80000000;
        rxId = (type & 0xFFFFFFFF)<<28 | (cmd & 0xFFFFFFFF)<<20 | (target & 0xFFFFFFFF)<<12 | (port & 0xFFFFFFFF)<<8 | source ;
        sprintf(buffer, "ID: %.8lX  Data: %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X\n\r",
@@ -343,6 +344,10 @@ bool AHB_GW_CAN_TO_OKBIT::ahbSend_V(uint8_t type, uint8_t cmd, uint8_t target, u
       //_interface.write(buffer); //
       //_interface.endPacket();
       
+}
+
+void AHB_GW_CAN_TO_OKBIT::SetNodeId(uint8_t nodeId){
+_nodeId=nodeId;
 }
 
 bool AHB_GW_CAN_TO_OKBIT::ahbReceive_V(ahbPacket &pkg){
@@ -366,8 +371,19 @@ bool AHB_GW_CAN_TO_OKBIT::ahbReceive_V(ahbPacket &pkg){
       _interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
       _interface.write(replyGate);
       _interface.endPacket();
+    
+    
+
     }
+      this->build(2, 2, 8000, 21, 3, 4, 5,6,7,8);//передача верcие прошивки и серийного номера на сборку пакета
+      _interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
+      _interface.write(replyGate);
+      _interface.endPacket();
   }
+ //this->build(_sub_id, _id, _device, 13, _sub_id, _id, _firmware[0], _firmware[1], mid_b[0], mid_b[1]);
+ //build(int b_sub_id, int b_id, int b_device, int b_cmd, int b_subto_id, int b_to_id, unsigned int b_vol1, unsigned int b_vol2, unsigned int b_vol3, unsigned int b_vol4)
+ // this->build(_sub_id, _id, _device, 30, _sub_id, _id, i, holdingRegs[i]);//передача верcие прошивки и серийного номера на сборку пакета
+
   
  holding_update();// Обработчик измениния регистров, в случае изменения состояния отправляеться запрос на сервер с передачей парамета
   if (status_err == 1) {
