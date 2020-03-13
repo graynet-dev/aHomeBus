@@ -192,8 +192,59 @@ void AHB_GW_CAN_TO_OKBIT::build(int b_sub_id, int b_id, int b_device, int b_cmd,
 
   b_pack = "4F4B4249542D554450AAAA";
 
-  if (b_cmd == 30) b_len_pack = 13;
-  if (b_cmd == 13) b_len_pack = 17;
+  if (b_cmd == 10) b_len_pack = 11;  //считать SN шлюза, версию прощивки
+  if (b_cmd == 11) b_len_pack = 11;  //ответ все хорошо
+  if (b_cmd == 12) b_len_pack = 17;  //ответ ошибка (1 - колличество ошибок в ОЗУ, 2- код последней ошибки)
+                                     //0013/D - передать SN шлюза, версию прощивки (1 - Значение прошивки 1, 
+                                     //2 - значение прошивки 2, 3 - серийный номер 1, 4 - серийный номер 2)
+  if (b_cmd == 13) b_len_pack = 17; //передать SN шлюза, версию прощивки 
+                                    //(1 - Значение прошивки 1, 2 - значение прошивки 2, 
+                                    //3 - серийный номер 1, 4 - серийный номер 2)
+  
+  //if (b_cmd == 14,15,16,17,18,19) b_len_pack = 11; //soon
+  
+  if (b_cmd == 20) b_len_pack = 11; //Поиск всех онлайн устройств
+  
+  if (b_cmd == 21) b_len_pack = 13; //Считать/передать тип устройства, версию прошивки (1- тип устройства, 
+                                    //2 - версия)
+  
+  if (b_cmd == 22) b_len_pack = 19; //Считат/передать коментарий устройства(n-е количество буквенный коментарий)
+  
+  if (b_cmd == 23) b_len_pack = 13; //Считать/передать статус входа (1 - адрес входа, 2- значение)
+  
+  if (b_cmd == 24) b_len_pack = 13; //Считать/передать значение ячейки ОЗУ (1 - адрес ячейки, 2 - значение)
+  
+  if (b_cmd == 25) b_len_pack = 13; //Считать/передать все значения ячеек ОЗУ
+  
+  if (b_cmd == 26) b_len_pack = 13;
+  
+  
+  
+  if (b_cmd == 30) b_len_pack = 13; //Присвоение значения ОЗУ (1 - адрес канал, 2 - значение)
+  
+  if (b_cmd == 31) b_len_pack = 13;
+  
+  if (b_cmd == 40) b_len_pack = 13;
+  
+  if (b_cmd == 41) b_len_pack = 13;
+  
+  if (b_cmd == 55) b_len_pack = 13;
+  
+  if (b_cmd == 60) b_len_pack = 13;
+  
+  if (b_cmd == 61) b_len_pack = 13;
+  
+  if (b_cmd == 62) b_len_pack = 13;
+  
+  if (b_cmd == 63) b_len_pack = 13;
+  
+  if (b_cmd == 64) b_len_pack = 13;
+  
+  if (b_cmd == 70) b_len_pack = 13;
+  
+  if (b_cmd == 255) b_len_pack = 13;
+  
+  //Длинна пакета 11,13,15,17,19
 
   sprintf(myStr, "%02X", b_len_pack );
   buf_pack = myStr;
@@ -372,13 +423,17 @@ bool AHB_GW_CAN_TO_OKBIT::ahbReceive_V(ahbPacket &pkg){
       _interface.write(replyGate);
       _interface.endPacket();
     
-    
-
-    }
-      this->build(2, 2, 8000, 21, 3, 4, 5,6,7,8);//передача верcие прошивки и серийного номера на сборку пакета
+      this->build(2, 2, 8002, 13, 3, 4, 3, 3, 7, 8);//передача верcие прошивки и серийного номера на сборку пакета
       _interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
       _interface.write(replyGate);
-      _interface.endPacket();
+      _interface.endPacket();   
+    
+      this->build(2, 2, 8002, 22, 567);//передача верcие прошивки и серийного номера на сборку пакета
+      _interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
+      _interface.write(replyGate);
+      _interface.endPacket();   
+    
+    }
   }
  //this->build(_sub_id, _id, _device, 13, _sub_id, _id, _firmware[0], _firmware[1], mid_b[0], mid_b[1]);
  //build(int b_sub_id, int b_id, int b_device, int b_cmd, int b_subto_id, int b_to_id, unsigned int b_vol1, unsigned int b_vol2, unsigned int b_vol3, unsigned int b_vol4)
