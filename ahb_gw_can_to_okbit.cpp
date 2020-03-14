@@ -415,11 +415,11 @@ bool AHB_GW_CAN_TO_OKBIT::ahbReceive_V(ahbPacket &pkg){
       _interface.write(replyGate);
       _interface.endPacket();   
       
-      this->build(2, 4, 8004, 22, 0, 0, 7777);//передача верcие прошивки и серийного номера на сборку пакета
-      _interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
-      _interface.write(replyGate);
-      _interface.endPacket();  
-      
+      //this->build(2, 4, 8004, 22, 0, 0, 7777);//передача верcие прошивки и серийного номера на сборку пакета
+      //_interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
+      //_interface.write(replyGate);
+      //_interface.endPacket();  
+/**      
       this->build(2, 5, 8005, 13, 0, 0, 5, 6, 1, 5);//передача верcие прошивки и серийного номера на сборку пакета
       _interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
       _interface.write(replyGate);
@@ -494,14 +494,15 @@ bool AHB_GW_CAN_TO_OKBIT::ahbReceive_V(ahbPacket &pkg){
       //this->build(2, 2, 8002, 22, 0, 0, 567);//передача верcие прошивки и серийного номера на сборку пакета
       //_interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
       //_interface.write(replyGate);
-      //_interface.endPacket();       
+      //_interface.endPacket();  
+ */     
     }
   }
   
  //this->build(_sub_id, _id, _device, 13, _sub_id, _id, _firmware[0], _firmware[1], mid_b[0], mid_b[1]);
  //build(int b_sub_id, int b_id, int b_device, int b_cmd, int b_subto_id, int b_to_id, unsigned int b_vol1, unsigned int b_vol2, unsigned int b_vol3, unsigned int b_vol4)
  // this->build(_sub_id, _id, _device, 30, _sub_id, _id, i, holdingRegs[i]);//передача верcие прошивки и серийного номера на сборку пакета
-
+/**
  holding_update();// Обработчик измениния регистров, в случае изменения состояния отправляеться запрос на сервер с передачей парамета
   if (status_err == 1) {
    status_err = 0;
@@ -510,7 +511,7 @@ bool AHB_GW_CAN_TO_OKBIT::ahbReceive_V(ahbPacket &pkg){
     _interface.write(replyGate);
     _interface.endPacket();
   }
-
+*/
   //debounce(); // вызов функции обработки нажатий кнопок
 
   //digitalWrite(lamp1, holdingRegs[1]); // вкл\выкл - лампы в зависимости от пришедшей команды по UDP или по нажатию кнопки
