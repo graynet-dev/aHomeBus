@@ -35,6 +35,7 @@
     #define AHB_CMD_F_NMT_HEARTBEAT               6  //
     #define AHB_CMD_F_NMT_HEARTBEAT_TO_SLAVE      7
     #define AHB_CMD_F_NMT_BOOT                    8  //
+    #define AHB_CMD_F_NMT_REBOOT                  9  //
 //PDO - передача коротких сообщений за такт     
     #define AHB_CMD_F_PDO_CMD_SEND                16  //
     #define AHB_CMD_F_PDO_CMD_ANSWER              17  //
