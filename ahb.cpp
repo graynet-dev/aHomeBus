@@ -1056,6 +1056,18 @@ void AHB::ahbRxProcessingNode(ahbPacket &pkg){
               }              
               break;
             }
+            case AHB_CMD_F_NMT_REBOOT:{
+              if (_nodeType==Master){
+                  while(1){}
+              }
+              if (_nodeType==Slave){
+                  while(1){}
+              }   
+              if (_nodeType==Node){
+                  while(1){}
+              }              
+              break;
+            }
             case AHB_CMD_F_NMT_PING:{ //Если нам PING отвечаем PONG, если от мастера устанавливаем время
               if (_nodeType!=Master){
                  hh_hw        = pkg.data[0];
