@@ -32,11 +32,7 @@ class AHB_WEB {
         
          void loop_web();
          
-         void loop_web2();
-         
          void loop_web3();
-         
-         void loop_web4();
          
          void GetSwitchState(EthernetClient cl);
 };
