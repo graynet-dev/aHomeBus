@@ -370,23 +370,28 @@ void AHB_GW_CAN_TO_OKBIT::holding_update() {
   }
 }
 
-bool AHB_GW_CAN_TO_OKBIT::ahbSend_V(uint8_t type, uint8_t cmd, uint8_t target, uint8_t port, uint8_t source,  uint8_t len, byte data[8]){
-       
-       uint32_t rxId = 0x80000000;
-       rxId = (type & 0xFFFFFFFF)<<28 | (cmd & 0xFFFFFFFF)<<20 | (target & 0xFFFFFFFF)<<12 | (port & 0xFFFFFFFF)<<8 | source ;
-       sprintf(buffer, "ID: %.8lX  Data: %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X\n\r",
-              rxId, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
-       //Serial.print("Okbit ");Serial.print(dest_gw_can_to_okbit);Serial.print(":");Serial.println(remPort_okbit);       
-      
-       //_interface.beginPacket(dest_gw_can_to_okbit, remPort_okbit);
-      //_interface.write(buffer); //
-      //_interface.endPacket();
-      
-}
-
 void AHB_GW_CAN_TO_OKBIT::SetNodeId(uint8_t nodeId){
 _nodeId=nodeId;
 }
+
+bool AHB_GW_CAN_TO_OKBIT::ahbSend_V(uint8_t type, uint8_t cmd, uint8_t target, uint8_t port, uint8_t source,  uint8_t len, byte data[8]){
+      //uint16_t type_gw;
+      //type_gw = 8000+source;
+      //this->build(2, 4, 8004, 13, 0, 0, 5, 6, 1, 4);
+      this->build(target, source, 8000+source, cmd, 0, 0, 1, 1, target, source);     
+      _interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
+      _interface.write(replyGate);
+      _interface.endPacket();  
+
+       //uint32_t rxId = 0x80000000;
+       //rxId = (type & 0xFFFFFFFF)<<28 | (cmd & 0xFFFFFFFF)<<20 | (target & 0xFFFFFFFF)<<12 | (port & 0xFFFFFFFF)<<8 | source ;
+       //sprintf(buffer, "ID: %.8lX  Data: %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X\n\r",
+       //       rxId, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
+       //Serial.print("Okbit ");Serial.print(dest_gw_can_to_okbit);Serial.print(":");Serial.println(remPort_okbit);             
+     
+}
+
+
 
 bool AHB_GW_CAN_TO_OKBIT::ahbReceive_V(ahbPacket &pkg){
 
@@ -394,13 +399,20 @@ bool AHB_GW_CAN_TO_OKBIT::ahbReceive_V(ahbPacket &pkg){
   if (packetSize)
   {
     // получаем входящие UDP-пакеты:
-    Serial.print("Received %d bytes from %s, port %d\n"); //, packetSize, _interface.remoteIP(), _interface.remotePort()); //  "Получено %d байт от %s, порт %d%"
+    Serial.print("Received "); //  "Получено %d байт от %s, порт %d%"
+    Serial.print(packetSize);
+    Serial.print(" bytes from ");
+    Serial.print(_interface.remoteIP());
+    Serial.print(", port ");
+    Serial.println(_interface.remotePort());
+    
     int len = _interface.read(incomingPacket, 255);
     if (len > 0){
       incomingPacket[len] = 0;
     }
-    Serial.print("Okbit UDP packet contents: %s\n");//, incomingPacket);
-
+    Serial.print("Okbit UDP packet contents: ");
+    Serial.println(incomingPacket);
+    
     parsing(incomingPacket, len, _interface.remoteIP());//обработка полученного пакета
 
     // отправляем ответ на IP-адрес и порт, с которых пришел пакет:
@@ -409,94 +421,43 @@ bool AHB_GW_CAN_TO_OKBIT::ahbReceive_V(ahbPacket &pkg){
       _interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
       _interface.write(replyGate);
       _interface.endPacket();
-
-      this->build(2, 4, 8004, 13, 0, 0, 5, 6, 1, 4);//передача верcие прошивки и серийного номера на сборку пакета
-      _interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
-      _interface.write(replyGate);
-      _interface.endPacket();   
+       
+      //this->build(2, 4, 8004, 13, 0, 0, 5, 6, 1, 4); //передача верcие прошивки и серийного номера на сборку пакета
+     // _interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
+     // _interface.write(replyGate);
+     // _interface.endPacket();  
       
       //this->build(2, 4, 8004, 22, 0, 0, 7777);//передача верcие прошивки и серийного номера на сборку пакета
       //_interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
       //_interface.write(replyGate);
       //_interface.endPacket();  
-/**      
-      this->build(2, 5, 8005, 13, 0, 0, 5, 6, 1, 5);//передача верcие прошивки и серийного номера на сборку пакета
-      _interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
-      _interface.write(replyGate);
-      _interface.endPacket();   
-
-      this->build(2, 6, 8006, 13, 0, 0, 5, 6, 1, 6);//передача верcие прошивки и серийного номера на сборку пакета
-      _interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
-      _interface.write(replyGate);
-      _interface.endPacket();   
-
-      this->build(2, 7, 8007, 13, 0, 0, 5, 6, 1, 7);//передача верcие прошивки и серийного номера на сборку пакета
-      _interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
-      _interface.write(replyGate);
-      _interface.endPacket();   
-
-      this->build(2, 8, 8008, 13, 0, 0, 5, 6, 1, 8);//передача верcие прошивки и серийного номера на сборку пакета
-      _interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
-      _interface.write(replyGate);
-      _interface.endPacket();   
-
-      this->build(2, 9, 8009, 13, 0, 0, 5, 6, 1, 9);//передача верcие прошивки и серийного номера на сборку пакета
-      _interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
-      _interface.write(replyGate);
-      _interface.endPacket();   
-
-      this->build(2, 10, 8010, 13, 0, 0, 5, 6, 1, 10);//передача верcие прошивки и серийного номера на сборку пакета
-      _interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
-      _interface.write(replyGate);
-      _interface.endPacket();         
-      
-      this->build(2, 11, 8011, 13, 0, 0, 5, 6, 1, 11);//передача верcие прошивки и серийного номера на сборку пакета
-      _interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
-      _interface.write(replyGate);
-      _interface.endPacket();   
-
-      this->build(2, 12, 8012, 13, 0, 0, 5, 6, 1, 12);//передача верcие прошивки и серийного номера на сборку пакета
-      _interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
-      _interface.write(replyGate);
-      _interface.endPacket();       
-
-      this->build(2, 13, 8013, 13, 0, 0, 5, 6, 1, 13);//передача верcие прошивки и серийного номера на сборку пакета
-      _interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
-      _interface.write(replyGate);
-      _interface.endPacket(); 
-      
-      this->build(2, 14, 8014, 13, 0, 0, 5, 6, 1, 14);//передача верcие прошивки и серийного номера на сборку пакета
-      _interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
-      _interface.write(replyGate);
-      _interface.endPacket(); 
-      
-      this->build(2, 15, 8015, 13, 0, 0, 5, 6, 1, 15);//передача верcие прошивки и серийного номера на сборку пакета
-      _interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
-      _interface.write(replyGate);
-      _interface.endPacket(); 
-      
-      this->build(2, 19, 8019, 13, 0, 0, 5, 6, 1, 19);//передача верcие прошивки и серийного номера на сборку пакета
-      _interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
-      _interface.write(replyGate);
-      _interface.endPacket(); 
-      
-      this->build(2, 20, 8020, 13, 0, 0, 5, 6, 1, 20);//передача верcие прошивки и серийного номера на сборку пакета
-      _interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
-      _interface.write(replyGate);
-      _interface.endPacket(); 
-      
-      this->build(2, 21, 8021, 13, 0, 0, 5, 6, 1, 21);//передача верcие прошивки и серийного номера на сборку пакета
-      _interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
-      _interface.write(replyGate);
-      _interface.endPacket(); 
-      
-      
-      //this->build(2, 2, 8002, 22, 0, 0, 567);//передача верcие прошивки и серийного номера на сборку пакета
-      //_interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
-      //_interface.write(replyGate);
-      //_interface.endPacket();  
- */     
+    
     }
+    //pkg.meta = ahbCanAddrParse(rxId);
+    //pkg.len = len;
+        #ifdef AHB_DEBUG  
+        Serial.print(F("  Length: 0x"));
+        //Serial.print(len);
+        #endif //AHB_DEBUG 
+        
+        for(byte i=0; i<len; i++){ 
+          //pkg.data[i] = rxBuf[i];
+          #ifdef AHB_DEBUG  
+          Serial.print(F(" 0x"));
+          //Serial.print(pkg.data[i]);
+          //Serial.print(F(" | "));
+         #endif //AHB_DEBUG 
+        }
+          
+        #ifdef AHB_DEBUG 
+          Serial.println();  
+        #endif //AHB_DEBUG
+        
+        return true;    
+  }
+  else
+  {
+    return false; 
   }
   
  //this->build(_sub_id, _id, _device, 13, _sub_id, _id, _firmware[0], _firmware[1], mid_b[0], mid_b[1]);
