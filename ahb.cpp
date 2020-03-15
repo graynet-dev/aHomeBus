@@ -830,9 +830,7 @@ bool AHB::ahbReceive(ahbPacket &pkg, bool routing) { //Нахуй роутинг
                    //END Ретрансляция в UDP и OKBIT
                    //Получение и обработка запросов от OKBIT
                    if (ReceiveBusType== type_GW_CAN_TO_OKBIT){
-                      Serial.println("OKBIT---------------------------------");
-                      
-                      uint16_t node_ahb;
+                      Serial.println("OKBIT---------------------------------"); 
                       for (int i = 4; i<255; i++) { //Надо с 0
                           if (NodeGuard_OK_check(i,1)) {
                               if (_nodeType==Master){
