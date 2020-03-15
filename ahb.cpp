@@ -788,8 +788,6 @@ bool AHB::ahbReceive(ahbPacket &pkg, bool routing) { //Нахуй роутинг
                     
         bool checkBusReceive = false; //Наличие пакета в шине
         uint8_t ReceiveBusType;       //Тип шины в которую пришел пакет;
-        uint8_t BusTypeGW_UDP;
-        uint8_t BusTypeGW_OKBIT;
         signed char busId_route;
         uint8_t packet_state;
         //uint8_t GW_CAN_TO_UDP_BusType;
@@ -799,27 +797,14 @@ bool AHB::ahbReceive(ahbPacket &pkg, bool routing) { //Нахуй роутинг
                 busId_route = 0;
                 bool target_my_net = false;
                 bool source_my_net = false;
-                //Вытаскиваем busId_GW_CAN_TO_UDP
-                BusTypeGW_UDP = _busAddr[busId]->busType();
-                  //Serial.print(BusTypeGW_UDP);Serial.println(" - CAN UDP TYPE");
-                if (BusTypeGW_UDP==type_GW_CAN_TO_UDP){
-                  //Serial.println("CAN UDP ATTACHED");
+                //Проверка наличия подключенных UDP_CAN и OKBIT_CAN
+                if (_busAddr[busId]->busType()==type_GW_CAN_TO_UDP){
                   busId_GW_CAN_TO_UDP=busId;
                 }
-                else{
-                  //Serial.print(busId_GW_CAN_TO_UDP);Serial.println(" - CAN UDP bus");
-                }
-                
-                //Вытаскиваем busId_GW_CAN_TO_OKBIT
-                BusTypeGW_OKBIT = _busAddr[busId]->busType();
-                  //Serial.print(BusTypeGW_OKBIT);Serial.println(" - CAN OKBIT TYPE");
-                if (BusTypeGW_OKBIT==type_GW_CAN_TO_OKBIT){
-                  //Serial.println("CAN OKBIT ATTACHED");
+                if (_busAddr[busId]->busType()==type_GW_CAN_TO_OKBIT){
                   busId_GW_CAN_TO_OKBIT=busId;
                 }
-                else{
-                  //Serial.print(busId_GW_CAN_TO_OKBIT);Serial.println(" - CAN UDP bus");
-                }
+
                 //Проверяем есть ли пришедний пакет из этой шины
                 checkBusReceive = _busAddr[busId]->ahbReceive_V(pkg);                
                 //Если пакет пришел то начинаем его разбор на предмет игнора, ретрансляции или маршрутизации
@@ -829,17 +814,44 @@ bool AHB::ahbReceive(ahbPacket &pkg, bool routing) { //Нахуй роутинг
                    /////////////////НЕ реализовано ahbAddRcvMsgQueue(pkg); 
                    //Все что ниже вынести в отдельную функцию - Зачем ???
                    ReceiveBusType = _busAddr[busId]->busType();
-                   //Отправка CAN по UDP на сервер
-                   if (_busAddr[busId_GW_CAN_TO_UDP] != 0x00){
-                       //Serial.println("CAN UDP");
-                      _busAddr[busId_GW_CAN_TO_UDP]->ahbSend_V(pkg.meta.type, pkg.meta.cmd, pkg.meta.target,  pkg.meta.port, pkg.meta.source, sizeof(pkg.data), pkg.data);
+                   //BEGIN Ретрансляция пакетов из шины в которую пришел пакет на UDP или OKBIT если они подключены
+                   if (ReceiveBusType!=type_GW_CAN_TO_UDP && ReceiveBusType!= type_GW_CAN_TO_OKBIT){
+                      //Если UDP включен Отправка CAN по UDP на сервер
+                      if (_busAddr[busId_GW_CAN_TO_UDP] != 0x00){
+                        //_busAddr[busId_GW_CAN_TO_UDP]->ahbSend_V(pkg.meta.type, pkg.meta.cmd, pkg.meta.target,  pkg.meta.port, pkg.meta.source, sizeof(pkg.data), pkg.data);
+                      }
+                      //Если OKBIT включен Отправка в Majordomo Okbit UDP
+                      if (_busAddr[busId_GW_CAN_TO_OKBIT] != 0x00){
+                        //Отправка в OKBIT изменений полученых из других сетей
+                        _busAddr[busId_GW_CAN_TO_OKBIT]->SetNodeId(_nodeId);
+                        //_busAddr[busId_GW_CAN_TO_OKBIT]->ahbSend_V(pkg.meta.type, pkg.meta.cmd, pkg.meta.target,  pkg.meta.port, pkg.meta.source, sizeof(pkg.data), pkg.data);
+                      }
+                   }  
+                   //END Ретрансляция в UDP и OKBIT
+                   //Получение и обработка запросов от OKBIT
+                   if (ReceiveBusType== type_GW_CAN_TO_OKBIT){
+                      Serial.println("OKBIT---------------------------------");
+                      
+                      uint16_t node_ahb;
+                      for (int i = 4; i<255; i++) { //Надо с 0
+                          if (NodeGuard_OK_check(i,1)) {
+                              if (_nodeType==Master){
+                                _busAddr[busId]->ahbSend_V(0, 13, 1,  0, i, 0, 0);
+                              }
+                              if (_nodeType==Slave){
+                                _busAddr[busId]->ahbSend_V(0, 13, 2,  0, i, 0, 0);
+                              }                              
+                          }
+                      }
+                      
+                      if (_nodeType==Master){
+                        _busAddr[busId]->ahbSend_V(0, 13, 1,  0, _nodeId, 0, 0); 
+                      }
+                      if (_nodeType==Slave){
+                        _busAddr[busId]->ahbSend_V(0, 13, 2,  0, _nodeId, 0, 0); 
+                      } 
+                      
                    }
-                   //Отправка в Majordomo Okbit UDP
-                   if (_busAddr[busId_GW_CAN_TO_OKBIT] != 0x00){
-                       //Serial.println("CAN OKBIT");
-                      _busAddr[busId_GW_CAN_TO_OKBIT]->SetNodeId(_nodeId);
-                      _busAddr[busId_GW_CAN_TO_OKBIT]->ahbSend_V(pkg.meta.type, pkg.meta.cmd, pkg.meta.target,  pkg.meta.port, pkg.meta.source, sizeof(pkg.data), pkg.data);
-                   }                   
                    pkg.meta.busId = busId;
                    pkg.meta.busType = ReceiveBusType;
                    packet_state=pkg_for_unknown; //Изначально ставим статус кому - неизвестно
