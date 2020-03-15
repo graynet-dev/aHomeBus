@@ -378,7 +378,7 @@ bool AHB_GW_CAN_TO_OKBIT::ahbSend_V(uint8_t type, uint8_t cmd, uint8_t target, u
       //uint16_t type_gw;
       //type_gw = 8000+source;
       //this->build(2, 4, 8004, 13, 0, 0, 5, 6, 1, 4);
-      this->build(target, source, 8000+source, cmd, 0, 0, 1, 1, target, source);     
+      this->build(target,source+target*100, 8000+source, cmd, 0, 0, 1, 1, target, source);     
       _interface.beginPacket(_interface.remoteIP(), _interface.remotePort());
       _interface.write(replyGate);
       _interface.endPacket();  
