@@ -24,7 +24,38 @@
 
     #include <Arduino.h>
     #include <inttypes.h>
+
+//CMD IN ID   FRAME
+//NMT - управление сетью
+    #define AHB_CMD_F_NMT_NULL                    128  //
+    #define AHB_CMD_F_NMT_PING                    129  //
+    #define AHB_CMD_F_NMT_PONG                    130  //
+    #define AHB_CMD_F_NMT_ACCIDENT_SEND           131  //
+    #define AHB_CMD_F_NMT_ACCIDENT_ANSWER         132  //
+    #define AHB_CMD_F_NMT_HEARTBEAT               133  //
+    #define AHB_CMD_F_NMT_HEARTBEAT_TO_SLAVE      134
+    #define AHB_CMD_F_NMT_BOOT                    135  //
+    #define AHB_CMD_F_NMT_REBOOT                  137  //
+//PDO - передача коротких сообщений за такт     
+    #define AHB_CMD_F_PDO_CMD_SEND                144  //
+    #define AHB_CMD_F_PDO_CMD_ANSWER              145  //
     
+    #define AHB_CMD_F_PDO_DATA_REQUEST            160  //
+    #define AHB_CMD_F_PDO_DATA_ANSWER             161  //
+    #define AHB_CMD_F_PDO_DATA_RECIVE             162  //
+//SDO - передача длинных сообщений за n тактов   
+    #define AHB_CMD_F_SDO_SEND_TX_INIT_REQUEST    176  //
+    #define AHB_CMD_F_SDO_SEND_TX_INIT_ANSWER     177  //
+    #define AHB_CMD_F_SDO_SEND_TX_BEGIN           178  //
+    #define AHB_CMD_F_SDO_SEND_TX_PROCESS         179  //
+    #define AHB_CMD_F_SDO_ANSWER_TX_PROCESS_OK    180  //
+    #define AHB_CMD_F_SDO_SEND_TX_REPEAT          181  //
+    #define AHB_CMD_F_SDO_ANSWER_TX_REPEAT_OK     182  //
+    #define AHB_CMD_F_SDO_SEND_TX_BEGIN           183  //
+//SYNC - команда всем начать синхронизацию
+    #define AHB_CMD_F_SYNC_ALL                    192  //
+
+/**    
 //CMD IN ID   FRAME
 //NMT - управление сетью
     #define AHB_CMD_F_NMT_NULL                    0  //
@@ -54,7 +85,8 @@
     #define AHB_CMD_F_SDO_SEND_TX_BEGIN           55  //
 //SYNC - команда всем начать синхронизацию
     #define AHB_CMD_F_SYNC_ALL                    64  //
-    
+*/
+   
 //CMD IN DATA FRAME
     //#define AHB_PKGTYPE_BROADCAST 0x00
     #define AHB_PKGTYPE_MULTICAST 0
@@ -142,6 +174,10 @@ typedef struct {
        * 
        */
       uint8_t busType = 0;
+      
+      bool priority = 0;
+      uint8_t msg_type = 0;
+      uint8_t dev_type = 0;
 } ahbMeta;
 
     /**
