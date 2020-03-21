@@ -162,7 +162,8 @@ typedef enum enum_nodeType {
      */    
 
 //void ahb_RXInt(void);
-//class AHB_NODE;
+class AHB_NODE;
+class AHB_NODE2;
 //class AHB_SLAVE;
 //class AHB_MASTER;
 
