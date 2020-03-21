@@ -770,7 +770,7 @@ bool AHB::ahbReceive(ahbPacket &pkg, bool routing) { //Нахуй роутинг
            pkg_for_my_broadcast_other_net, //Получатель в другой сети подключеной ко мне, получено широковещательно
            pkg_for_my_other_net            //Получатель в другой сети
         }pkg_state_ENUM;
-
+        
         //Пришедшие сообщения по target (кому) делятся на
         //1. Домашней сети       1.1 Да         1.2 Нет(аварийный  пакет)
         //2. Моему узлу          2.1 Мне.       2.2 Мне по Broadcast 2.3 В другую сеть подключенную ко мне
@@ -905,7 +905,6 @@ bool AHB::ahbReceive(ahbPacket &pkg, bool routing) { //Нахуй роутинг
                       packet_state=pkg_for_net; 
                     }
 
-                    //Serial.println(F("RX PACKET"));
                     switch (packet_state){
                       case pkg_for_unknown: { //Получатель не определен
                         #ifdef AHB_DEBUG
