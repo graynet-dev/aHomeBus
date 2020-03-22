@@ -119,7 +119,7 @@ AHB::AHB(uint8_t id, uint8_t ndType) {
 
 
 
-void watchdogSetup(void) {/*** watchdogDisable (); ***/}
+void watchdogSetup(void) {/*** watchdogDisable (); ***/} //Не удалять. Без этого не работает WTD
 
 byte AHB::begin() {
         Wire.begin();
@@ -159,39 +159,6 @@ void AHB::WTD(void){
         }
 }
 
-bool AHB::WTD_set(bool set_wdt){
-        #ifdef AHB_DEBUG
-            Serial.print(F("WTD!"));
-        #endif //AHB_DEBUG
-        //WDTO_15MS // 15 мс  //WDTO_30MS // 30 мс  //WDTO_60MS // 60 мс //WDTO_120MS // 120 мс //WDTO_250MS // 250 мс //WDTO_500MS // 500 мс //WDTO_1S // 1 сек //WDTO_2S // 2 сек //WDTO_4S // 4 сек //WDTO_8S // 8 сек
-        if (set_wdt){
-          #if defined  (__AVR__)         
-            wdt_enable(WDTO_8S);
-            #ifdef AHB_DEBUG
-                Serial.print(F("Enable WTD"));
-            #endif //AHB_DEBUG
-            return 1;
-          #else
-            watchdogEnable(1000);
-            return 1;
-          #endif
-        }
-        else{
-          #if defined  (__AVR__)
-            wdt_disable();
-            #ifdef AHB_DEBUG
-                Serial.print(F("Disable WTD"));
-            #endif //AHB_DEBUG
-            return 0;
-          #else
-            watchdogDisable ();
-            return 0;
-          #endif
-        }
-}
-
-
-
 bool AHB::firstboot(void (*function)(),bool manual) {
         if(function == NULL) return false;
         if(_nodeId < 1 || _nodeId > 255 || manual) { 
@@ -201,7 +168,8 @@ bool AHB::firstboot(void (*function)(),bool manual) {
             #endif //AHB_DEBUG
             function();
             return true;
-        }else{
+        }
+        else{
             return false;
         }
 }
@@ -215,42 +183,22 @@ bool AHB::setNodeId(unsigned int id) {
         return true;
 }
 
-//void ahb_RXInt() {
-//      ahbPacket pkg;
-//      ahbReceive(pkg);
-//}
-
 bool AHB::masterAttach(AHB_MASTER *mas) {
-  _master = mas;
-  return true;
+        _master = mas;
+        return true;
 }
 
 bool AHB::slaveAttach(AHB_SLAVE *sla) {
-  _slave = sla;
-  return true;
+        _slave = sla;
+        return true;
 }
 
 bool AHB::nodeAttach(AHB_NODE *node) {
-  _node = node;
-  return true;
-}
-
-
-bool AHB::NodeGuard_OK_check (uint8_t a, uint8_t b){
-  bool x;
-  if (_nodeType==Master){
-    x=_master->NodeGuard_OK[a][b];
-  }
-  if (_nodeType==Slave){
-    x=_slave->NodeGuard_OK[a][b];
-  }
-  return x;
+        _node = node;
+        return true;
 }
 
 char AHB::busAttach(AHB_COMM *bus) {
-      
-       //attachInterrupt(2, ahb_RXInt, FALLING); //вместо 2 поставить INT PIN 
-
         for(signed char busId=0; busId<AHB_BUSNUM; busId++) {
             if(_busAddr[busId] == 0x00) {
                 _busAddr[busId] = bus;                              
@@ -280,82 +228,6 @@ bool AHB::busDetach(signed char busId) {
         if(_busAddr[busId] == 0x00) return false;
         _busAddr[busId] = 0x00;
         return true;
-}
-
-unsigned int AHB::cfgFindFreeblock(byte bytes, byte id) {
-        if(_cfgAddrStart == _cfgAddrStop)  {
-            #ifdef AHB_DEBUG
-                Serial.print(F("EEPROM space 0")); Serial.println(); 
-            #endif //AHB_DEBUG
-            return 0;
-        }
-        
-        bytes++; //Header
-        
-        #ifdef AHB_DEBUG
-            Serial.print(F("ID is ")); Serial.println(id); 
-            Serial.print(F("size is ")); Serial.println(bytes, HEX); 
-        #endif //AHB_DEBUG
-
-        unsigned int address = _cfgAddrStart+2; //bytes 1+2 are our ID
-        byte check,len;
-
-        if(((int)_cfgAddrStop-_cfgAddrStart-bytes) < 0) {
-            #ifdef AHB_DEBUG
-                Serial.print(F("Space < length")); Serial.println(); 
-            #endif //AHB_DEBUG
-            return 0;
-        }
-
-        do {
-            #ifdef AHB_EEPROM_USE
-            check = EEPROM.read(address);
-            #endif //AHB_EEPROM_USE
-            #ifdef AHB_DEBUG
-                Serial.print(F("check addr ")); Serial.println(address); 
-                Serial.print(F(" = ")); Serial.println(check, HEX); 
-            #endif //AHB_DEBUG
-            if(check == 0xFF || check == 0) { //Nothing saved yet
-                len = 0;
-                while(((1 << len) + 5) < bytes) {
-                    #ifdef AHB_DEBUG
-                        Serial.print(F("Testing length")); Serial.println(len); 
-                    #endif //AHB_DEBUG
-                    len++;
-                    if(len > 0x0F) {
-                        #ifdef AHB_DEBUG
-                            Serial.print(F("length exceeded")); Serial.println(); 
-                        #endif //AHB_DEBUG
-                        return 0;
-                    }
-                }
-                #ifdef AHB_DEBUG
-                    Serial.print(F("final length")); Serial.println(len); 
-                #endif //AHB_DEBUG
-
-                check  = (id << 4) | len;
-                
-                #ifdef AHB_DEBUG
-                    Serial.print(F("ID is now ")); Serial.println(check, HEX); 
-                #endif //AHB_DEBUG
-                
-                #ifdef AHB_EEPROM_USE
-                EEPROM.write(address, check);
-                #endif //AHB_EEPROM_USE
-                
-                return address;
-            }
-
-            len = ((1 << (check & 0x0F)) + 5);
-            if((check & 0xF0) == 0x00 && len >= bytes) { //block is marked as free and has enough free space
-                //@TODO try to split into multiple blocks
-                return address;
-            //@TODO check if adjacent block is also free
-            }else{
-                address += len;
-            }
-        }while(address+bytes < _cfgAddrStop);
-        return 0;
 }
 
 bool AHB::hookAttach(byte type, unsigned int target, char port, byte firstByte, void (*function)(ahbPacket&)) {
@@ -442,23 +314,101 @@ bool AHB::hookDetachModule(byte id) {
         return false;
 }
 
+bool AHB::NodeGuard_OK_check (uint8_t a, uint8_t b){
+        bool x;
+        if (_nodeType==Master){
+            x=_master->NodeGuard_OK[a][b];
+        }
+        if (_nodeType==Slave){
+            x=_slave->NodeGuard_OK[a][b];
+        }
+        return x;
+}
+
+unsigned int AHB::cfgFindFreeblock(byte bytes, byte id) {
+        if(_cfgAddrStart == _cfgAddrStop)  {
+            #ifdef AHB_DEBUG
+                Serial.print(F("EEPROM space 0")); Serial.println(); 
+            #endif //AHB_DEBUG
+            return 0;
+        }
+        
+        bytes++; //Header
+        
+        #ifdef AHB_DEBUG
+            Serial.print(F("ID is ")); Serial.println(id); 
+            Serial.print(F("size is ")); Serial.println(bytes, HEX); 
+        #endif //AHB_DEBUG
+
+        unsigned int address = _cfgAddrStart+2; //bytes 1+2 are our ID
+        byte check,len;
+
+        if(((int)_cfgAddrStop-_cfgAddrStart-bytes) < 0) {
+            #ifdef AHB_DEBUG
+                Serial.print(F("Space < length")); Serial.println(); 
+            #endif //AHB_DEBUG
+            return 0;
+        }
+
+        do {
+            #ifdef AHB_EEPROM_USE
+            check = EEPROM.read(address);
+            #endif //AHB_EEPROM_USE
+            #ifdef AHB_DEBUG
+                Serial.print(F("check addr ")); Serial.println(address); 
+                Serial.print(F(" = ")); Serial.println(check, HEX); 
+            #endif //AHB_DEBUG
+            if(check == 0xFF || check == 0) { //Nothing saved yet
+                len = 0;
+                while(((1 << len) + 5) < bytes) {
+                    #ifdef AHB_DEBUG
+                        Serial.print(F("Testing length")); Serial.println(len); 
+                    #endif //AHB_DEBUG
+                    len++;
+                    if(len > 0x0F) {
+                        #ifdef AHB_DEBUG
+                            Serial.print(F("length exceeded")); Serial.println(); 
+                        #endif //AHB_DEBUG
+                        return 0;
+                    }
+                }
+                #ifdef AHB_DEBUG
+                    Serial.print(F("final length")); Serial.println(len); 
+                #endif //AHB_DEBUG
+
+                check  = (id << 4) | len;
+                
+                #ifdef AHB_DEBUG
+                    Serial.print(F("ID is now ")); Serial.println(check, HEX); 
+                #endif //AHB_DEBUG
+                
+                #ifdef AHB_EEPROM_USE
+                EEPROM.write(address, check);
+                #endif //AHB_EEPROM_USE
+                
+                return address;
+            }
+
+            len = ((1 << (check & 0x0F)) + 5);
+            if((check & 0xF0) == 0x00 && len >= bytes) { //block is marked as free and has enough free space
+                //@TODO try to split into multiple blocks
+                return address;
+            //@TODO check if adjacent block is also free
+            }else{
+                address += len;
+            }
+        }while(address+bytes < _cfgAddrStop);
+        return 0;
+}
+
+
 
 void AHB::system_uptime(void) {
         if (curMillis - prevSystemtime_ut > 1000) {
           ss_ut++; 
-          if (ss_ut >=60) {
-            ss_ut = 0; mm_ut++; 
-            if (mm_ut >=60) {
-              mm_ut = 0; hh_ut++; 
-              if (hh_ut>=24) {
-                dd_ut++; hh_ut=0;
-              }
-            }
-          } 
+          if (ss_ut >=60) {ss_ut = 0; mm_ut++; if (mm_ut >=60) {mm_ut = 0; hh_ut++; if (hh_ut>=24) {dd_ut++; hh_ut=0;}}} 
           prevSystemtime_ut = curMillis;
-          
           //PrintSystemUpTime();          
-          
           //Так как аппаратные часы есть только в мастере а время приходит раз в 5 сек, 
           //продолжаем крутить счетчик для коррекции псевдоаппаратного времени
           if (_nodeType==Master){
@@ -466,114 +416,91 @@ void AHB::system_uptime(void) {
             //PrintSystemHwTime();
           }
           else {
-              if (ss_hw< 60) {
-                ss_hw++;
-              } 
-              else {
-                ss_hw=0; 
-                if (mm_hw < 60) {
-                  mm_hw++;
-                }
-                else {
-                  mm_hw=0;
-                  if (hh_hw <24) {
-                    hh_hw++;
-                  }
-                  else{
-                    hh_hw=0;
-                  }
-                }
-              };
-              //PrintSystemHwTime();
+            if (ss_hw< 60) {ss_hw++;} else {ss_hw=0; if (mm_hw < 60) {mm_hw++;} else { mm_hw=0; if (hh_hw <24) {hh_hw++;}else{hh_hw=0;}}} //;
+            //PrintSystemHwTime();
           }
         } 
 } 
 
 void AHB::PrintSystemUpTime (void){ 
-  Serial.print("System Up Time - ");
-  if (dd_ut<10)  Serial. print (F("0")); 
-  Serial. print (dd_ut);  
-  Serial. print (F(" - ")); 
-  if (hh_ut<10)  Serial. print (F("0")); 
-  Serial. print (hh_ut);  
-  Serial. print (F(":")); 
-  if (mm_ut<10)  Serial. print (F("0")); 
-  Serial. print (mm_ut);  
-  Serial. print (F(":")); 
-  if (ss_ut<10)  Serial. print (F("0")); 
-  Serial. print (ss_ut);  
-  Serial. print(F("  "));    
+        Serial.print("System Up Time - ");
+        if (dd_ut<10)  Serial. print (F("0")); 
+        Serial. print (dd_ut);  
+        Serial. print (F(" - ")); 
+        if (hh_ut<10)  Serial. print (F("0")); 
+        Serial. print (hh_ut);  
+        Serial. print (F(":")); 
+        if (mm_ut<10)  Serial. print (F("0")); 
+        Serial. print (mm_ut);  
+        Serial. print (F(":")); 
+        if (ss_ut<10)  Serial. print (F("0")); 
+        Serial. print (ss_ut);  
+        Serial. print(F("  "));    
 }
 
 void AHB::PrintSystemHwTime (void){
-  Serial.print("System HW Time - ");
-//Время
-  if (hh_hw<10)  Serial. print (F("0")); 
-  Serial. print (hh_hw, DEC);  
-  Serial. print (F(":")); 
-  if (mm_hw<10)  Serial. print (F("0")); 
-  Serial. print (mm_hw, DEC);  
-  Serial. print (F(":")); 
-  if (ss_hw<10)  Serial. print (F("0")); 
-  Serial. print (ss_hw, DEC);  
-  Serial. print (F(" - ")); 
-//День недели
-  switch(dayOfWeek_hw){
-
-  case 1:
-    Serial.print(" Пн. - "); //Serial.println("Monday");
-    break;
-  case 2:
-    Serial.print(" Вт. - "); //Serial.println("Tuesday");
-    break;
-  case 3:
-    Serial.print(" Ср. - "); //Serial.println("Wednesday");
-    break;
-  case 4:
-    Serial.print(" Чт. - "); //Serial.println("Thursday");
-    break;
-  case 5:
-    Serial.print(" Пт. - "); //Serial.println("Friday");
-    break;
-  case 6:
-    Serial.print(" Суб. - "); //Serial.println("Saturday");
-    break;
-  case 7:
-    Serial.print(" Вс. - "); //Serial.println("Sunday");
-    break;
-  }
-//Дата  
-  if (dd_hw<10)  Serial. print (F("0")); 
-  Serial. print (dd_hw, DEC);  
-  Serial. print (F(".")); 
-  if (month_hw<10){
-    Serial.print("0");
-  }  
-  Serial.print(month_hw, DEC);
-  Serial.print(".20");  
-  Serial.print(year_hw, DEC);
-//Температура CPU
- Serial.print(" - T CPU - "); Serial.println(temp_hw);
+        Serial.print("System HW Time - ");
+        //Время
+        if (hh_hw<10)  Serial. print (F("0")); 
+        Serial. print (hh_hw, DEC);  
+        Serial. print (F(":")); 
+        if (mm_hw<10)  Serial. print (F("0")); 
+        Serial. print (mm_hw, DEC);  
+        Serial. print (F(":")); 
+        if (ss_hw<10)  Serial. print (F("0")); 
+        Serial. print (ss_hw, DEC);  
+        Serial. print (F(" - ")); 
+        //День недели
+        switch(dayOfWeek_hw){
+          case 1:
+            Serial.print(" Пн. - "); //Serial.println("Monday");
+            break;
+          case 2:
+            Serial.print(" Вт. - "); //Serial.println("Tuesday");
+            break;
+          case 3:
+            Serial.print(" Ср. - "); //Serial.println("Wednesday");
+            break;
+          case 4:
+            Serial.print(" Чт. - "); //Serial.println("Thursday");
+            break;
+          case 5:
+            Serial.print(" Пт. - "); //Serial.println("Friday");
+            break;
+          case 6:
+            Serial.print(" Суб. - "); //Serial.println("Saturday");
+            break;
+          case 7:
+            Serial.print(" Вс. - "); //Serial.println("Sunday");
+            break;
+        }
+        //Дата  
+        if (dd_hw<10)  Serial. print (F("0")); 
+        Serial. print (dd_hw, DEC);  
+        Serial. print (F(".")); 
+        if (month_hw<10){
+          Serial.print("0");
+        }  
+        Serial.print(month_hw, DEC);
+        Serial.print(".20");  
+        Serial.print(year_hw, DEC);
+        //Температура CPU
+        Serial.print(" - T CPU - "); Serial.println(temp_hw);
 }
-
-
-
 
 void AHB::system_hwtime(void){
-  byte second, minute, hour, dayOfWeek, dayOfMonth, month, year;
-  // retrieve data from DS3231
-  readDS3231time(&second, &minute, &hour, &dayOfWeek, &dayOfMonth, &month,
-  &year);  
-  temp_hw=readDS3231temp();
-  ss_hw=second;
-  mm_hw=minute;
-  hh_hw=hour;
-  dayOfWeek_hw=dayOfWeek;
-  dd_hw=dayOfMonth;
-  month_hw=month;
-  year_hw=year;
+        byte second, minute, hour, dayOfWeek, dayOfMonth, month, year;
+        // retrieve data from DS3231
+        readDS3231time(&second, &minute, &hour, &dayOfWeek, &dayOfMonth, &month, &year);  
+        temp_hw=readDS3231temp();
+        ss_hw=second;
+        mm_hw=minute;
+        hh_hw=hour;
+        dayOfWeek_hw=dayOfWeek;
+        dd_hw=dayOfMonth;
+        month_hw=month;
+        year_hw=year;
 }
-
 
 uint8_t AHB::print_ss_ut(void){return ss_ut;}
 uint8_t AHB::print_mm_ut(void){return mm_ut;}
@@ -588,34 +515,34 @@ uint8_t AHB::print_year_hw(void){return year_hw;}
 uint8_t AHB::print_dayofweak_hw(void){return dayOfWeek_hw;}
 
 uint8_t AHB::print_tx_error_rn(uint8_t i){
-  if (_nodeType==Master) {return _master->ut_rn[i][5];}
-  if (_nodeType==Slave) {return _slave->ut_rn[i][5];}
+        if (_nodeType==Master) {return _master->ut_rn[i][5];}
+        if (_nodeType==Slave) {return _slave->ut_rn[i][5];}
 }
 uint8_t AHB::print_rx_error_rn(uint8_t i){
-  if (_nodeType==Master) {return _master->ut_rn[i][4];}
-  if (_nodeType==Slave) {return _slave->ut_rn[i][4];}
+        if (_nodeType==Master) {return _master->ut_rn[i][4];}
+        if (_nodeType==Slave) {return _slave->ut_rn[i][4];}
 }
 
 uint8_t AHB::print_reboot(uint8_t i){
-  if (_nodeType==Master) {return _master->ut_rn[i][6];}
-  if (_nodeType==Slave) {return _slave->ut_rn[i][6];}
+        if (_nodeType==Master) {return _master->ut_rn[i][6];}
+        if (_nodeType==Slave) {return _slave->ut_rn[i][6];}
 } 
 
 uint8_t AHB::print_ss_rn(uint8_t i){
-  if (_nodeType==Master) {return _master->ut_rn[i][3];}
-  if (_nodeType==Slave) {return _slave->ut_rn[i][3];}
+        if (_nodeType==Master) {return _master->ut_rn[i][3];}
+        if (_nodeType==Slave) {return _slave->ut_rn[i][3];}
 }
 uint8_t AHB::print_mm_rn(uint8_t i){
-  if (_nodeType==Master) {return _master->ut_rn[i][2];}
-  if (_nodeType==Slave) {return _slave->ut_rn[i][2];}
+        if (_nodeType==Master) {return _master->ut_rn[i][2];}
+        if (_nodeType==Slave) {return _slave->ut_rn[i][2];}
 }
 uint8_t AHB::print_hh_rn(uint8_t i){
-  if (_nodeType==Master) {return _master->ut_rn[i][1];}
-  if (_nodeType==Slave) {return _slave->ut_rn[i][1];}
+        if (_nodeType==Master) {return _master->ut_rn[i][1];}
+        if (_nodeType==Slave) {return _slave->ut_rn[i][1];}
 }
 uint8_t AHB::print_dd_rn(uint8_t i){
-  if (_nodeType==Master) {return _master->ut_rn[i][0];}
-  if (_nodeType==Slave) {return _slave->ut_rn[i][0];}
+        if (_nodeType==Master) {return _master->ut_rn[i][0];}
+        if (_nodeType==Slave) {return _slave->ut_rn[i][0];}
 }
 
 
@@ -624,68 +551,61 @@ byte AHB::decToBcd(byte val){return( (val/10*16) + (val%10) );}
 // Convert binary coded decimal to normal decimal numbers
 byte AHB::bcdToDec(byte val){return( (val/16*10) + (val%16) );}
 
-float AHB::readDS3231temp()
-{
-    uint8_t msb, lsb;
-    Wire.beginTransmission(DS3231_I2C_ADDRESS);
-    Wire.write(DS3231_REG_TEMPERATURE);
-    Wire.endTransmission();
-    Wire.requestFrom(DS3231_I2C_ADDRESS, 2);
-    while(!Wire.available()) {};
-    msb = Wire.read();
-    lsb = Wire.read();
-    return ((((short)msb << 8) | (short)lsb) >> 6) / 4.0f;
+float AHB::readDS3231temp(){
+        uint8_t msb, lsb;
+        Wire.beginTransmission(DS3231_I2C_ADDRESS);
+        Wire.write(DS3231_REG_TEMPERATURE);
+        Wire.endTransmission();
+        Wire.requestFrom(DS3231_I2C_ADDRESS, 2);
+        while(!Wire.available()) {};
+        msb = Wire.read();
+        lsb = Wire.read();
+        return ((((short)msb << 8) | (short)lsb) >> 6) / 4.0f;
 }
 
-void AHB::setDS3231time(byte second, byte minute, byte hour, byte dayOfWeek, byte dayOfMonth, 
-byte month, byte year)
-{
-  // sets time and date data to DS3231
-  Wire.beginTransmission(DS3231_I2C_ADDRESS);
-  Wire.write(0); // set next input to start at the seconds register
-  Wire.write(decToBcd(second)); // set seconds
-  Wire.write(decToBcd(minute)); // set minutes
-  Wire.write(decToBcd(hour)); // set hours
-  Wire.write(decToBcd(dayOfWeek)); // set day of week (1=Sunday, 7=Saturday)
-  Wire.write(decToBcd(dayOfMonth)); // set date (1 to 31)
-  Wire.write(decToBcd(month)); // set month
-  Wire.write(decToBcd(year)); // set year (0 to 99)
-  Wire.endTransmission();
+void AHB::setDS3231time(byte second, byte minute, byte hour, byte dayOfWeek, byte dayOfMonth, byte month, byte year){
+        // sets time and date data to DS3231
+        Wire.beginTransmission(DS3231_I2C_ADDRESS);
+        Wire.write(0); // set next input to start at the seconds register
+        Wire.write(decToBcd(second)); // set seconds
+        Wire.write(decToBcd(minute)); // set minutes
+        Wire.write(decToBcd(hour)); // set hours
+        Wire.write(decToBcd(dayOfWeek)); // set day of week (1=Sunday, 7=Saturday)
+        Wire.write(decToBcd(dayOfMonth)); // set date (1 to 31)
+        Wire.write(decToBcd(month)); // set month
+        Wire.write(decToBcd(year)); // set year (0 to 99)
+        Wire.endTransmission();
 }
 
-void AHB::readDS3231time(byte *second,byte *minute,byte *hour,byte *dayOfWeek,byte *dayOfMonth,
-byte *month,byte *year)
-{
-
-  Wire.beginTransmission(DS3231_I2C_ADDRESS);
-  Wire.write(0); // set DS3231 register pointer to 00h
-  Wire.endTransmission();
-  Wire.requestFrom(DS3231_I2C_ADDRESS, 7);
-  // request seven bytes of data from DS3231 starting from register 00h
-  *second = bcdToDec(Wire.read() & 0x7f);
-  *minute = bcdToDec(Wire.read());
-  *hour = bcdToDec(Wire.read() & 0x3f);
-  *dayOfWeek = bcdToDec(Wire.read());
-  *dayOfMonth = bcdToDec(Wire.read());
-  *month = bcdToDec(Wire.read());
-  *year = bcdToDec(Wire.read());
-
+void AHB::readDS3231time(byte *second,byte *minute,byte *hour,byte *dayOfWeek,byte *dayOfMonth,byte *month,byte *year){
+        Wire.beginTransmission(DS3231_I2C_ADDRESS);
+        Wire.write(0); // set DS3231 register pointer to 00h
+        Wire.endTransmission();
+        Wire.requestFrom(DS3231_I2C_ADDRESS, 7);
+        // request seven bytes of data from DS3231 starting from register 00h
+        *second = bcdToDec(Wire.read() & 0x7f);
+        *minute = bcdToDec(Wire.read());
+        *hour = bcdToDec(Wire.read() & 0x3f);
+        *dayOfWeek = bcdToDec(Wire.read());
+        *dayOfMonth = bcdToDec(Wire.read());
+        *month = bcdToDec(Wire.read());
+        *year = bcdToDec(Wire.read());
 }
 
 byte AHB::ahbSend(uint8_t target, byte len, byte data[8]) { //3 Моя логика
-    return ahbSend(0, 0, target, 0, _nodeId, len, data); //[8]
+        return ahbSend(0, 0, target, 0, _nodeId, len, data); //[8]
 }
 
 byte AHB::ahbSend(uint8_t type, uint8_t target, byte len, byte data[8]) { //4 Моя логика
-    return ahbSend(type, 0, target, 0, _nodeId, len, data); //[8]
+        return ahbSend(type, 0, target, 0, _nodeId, len, data); //[8]
 }
 
 byte AHB::ahbSend(uint8_t type, uint8_t cmd, uint8_t target, byte len, byte data[8]) { //5 Моя логика
-    return ahbSend(type, cmd, target, 0, _nodeId, len, data); //[8]
+        return ahbSend(type, cmd, target, 0, _nodeId, len, data); //[8]
 }
 
 byte AHB::ahbSend(uint8_t type, uint8_t cmd,  uint8_t target, uint8_t port, byte len, byte data[8]) { //6 Моя логика
-    return ahbSend(type, cmd, target, port, _nodeId, len, data); //[8]
+        return ahbSend(type, cmd, target, port, _nodeId, len, data); //[8]
 }
 
 byte AHB::ahbSend(uint8_t type, uint8_t cmd, uint8_t target, uint8_t port, uint8_t source, byte len, byte data[8]) { //7 Моя логика
@@ -933,7 +853,7 @@ bool AHB::ahbReceive(ahbPacket &pkg, bool routing) { //Нахуй роутинг
                           Serial.println();
                         #endif
                         ahbProcess(pkg);
-                        ahbRxProcessingNode(pkg);
+                        ahbRxProcessingCMD(pkg);
                         break;
                       }
                       case pkg_for_my_address: { //Получатель я, получено адресно
@@ -949,7 +869,7 @@ bool AHB::ahbReceive(ahbPacket &pkg, bool routing) { //Нахуй роутинг
                           Serial.println();
                         #endif
                         ahbProcess(pkg);
-                        ahbRxProcessingNode(pkg);
+                        ahbRxProcessingCMD(pkg);
                         break;
                       }
                       
@@ -1032,10 +952,7 @@ bool AHB::ahbReceive(ahbPacket &pkg, bool routing) { //Нахуй роутинг
                        
                         break;
                       }
-                    }
-                                      
-                  //Еще реализовать ретрансляцию на UART и пр. шины, Видимо в конструкторе класса
-                                        
+                    }                                                                              
                   return true;
                 }
             }
@@ -1048,7 +965,7 @@ bool AHB::ahbReceiveRouting(ahbPacket &pkg, uint8_t packet_state, signed char bu
 
 }
 
-void AHB::ahbRxProcessingNode(ahbPacket &pkg){
+void AHB::ahbRxProcessingCMD(ahbPacket &pkg){
         byte i;
         byte data[4] = {dd_ut,hh_ut, mm_ut, ss_ut}; //Отправляем свой UP_time мастеру или запросившему
         bool status_send = false;
@@ -1204,7 +1121,7 @@ void AHB::ahbRxProcessingNode(ahbPacket &pkg){
             }
             
            default:{
-                       
+              _node->RX_PROC_NODE_COMMAND(pkg);         
               break;
            }        
         }
@@ -1562,7 +1479,7 @@ void AHB::ahbNodeGuard(uint8_t bus_Type) {
     //Если получили PONG то ???????
 }
 
-void AHB::ahbNodeGuard_print(void) {
+void AHB::ahbStatusNode_print(void) {
       if  (curMillis-prevTimeNodeGuard_print > intervalNodeGuard_print*1000) {
            for (int i=0; i<255;i++){ //Бежим по всему адресному пространству всей сети!!! 1-255, а не конкретной CAN сети
               if (_nodeType==Master){
@@ -1600,7 +1517,6 @@ void AHB::ahbNodeGuard_print(void) {
 
 
 ahbPacket AHB::loop(void) {
-
         WTD();
         byte i;
         curMillis = millis(); // print system time
@@ -1617,18 +1533,16 @@ ahbPacket AHB::loop(void) {
         system_uptime(); //Подсчет Up Time
         
         ahbReceive(pkg); //Прием сообщений
-        
-        
-             
+                 
         if (_nodeType==Master){   //Мастер
           //ahbNodeGuard(type_CAN); //NodeGuard Формирование запросов к узлам //ahbAddSendMsgQueue запросы к узлам
           ahbHeartbeat(type_CAN); //Heartbeat Формирование запросов к узлам //ahbAddSendMsgQueue запросы к узлам
-          ahbNodeGuard_print();   //Вывод состояния узлов 
+          ahbStatusNode_print();   //Вывод состояния узлов 
         }
         if (_nodeType==Slave){   //Слейв
           //ahbNodeGuard(type_CAN); //NodeGuard Формирование запросов к узлам //ahbAddSendMsgQueue запросы к узлам
           ahbHeartbeat(type_CAN); //Heartbeat Формирование запросов к узлам //ahbAddSendMsgQueue запросы к узлам
-          ahbNodeGuard_print();   //Вывод состояния узлов 
+          ahbStatusNode_print();   //Вывод состояния узлов 
         }        
         if (_nodeType==Node){   //Слейв
           ahbHeartbeat(type_CAN);
@@ -1636,9 +1550,6 @@ ahbPacket AHB::loop(void) {
         }
         
         //ahbSendMsgQueue(); //Отправка очереди ahbSendMsgQueue()
-    
-        
-        
         //SetAlarm(0, &errorStateBlink, 62, 62);       
         //установка флагов по таймерам
         //ahbTimers(_nodeType);       
@@ -1653,8 +1564,6 @@ ahbPacket AHB::loop(void) {
 
         return pkg;
 }
-
-
 
 //void AHB::ahbTimers() {}
 
