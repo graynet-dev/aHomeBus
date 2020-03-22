@@ -193,7 +193,7 @@ typedef struct {
         /**
          * length in bytes, 0-8. -1 indicates invalid packet
          */
-       char len = -1;
+        char len = -1;
         /**
          * payload
          */
