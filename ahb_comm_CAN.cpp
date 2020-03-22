@@ -213,8 +213,8 @@ uint32_t AHB_CAN::ahbCanAddrAssemble(bool priority, uint8_t dev_type, uint8_t f_
           return addr;
 }
 
-bool AHB_CAN::ahbSend_V(uint8_t type, uint8_t cmd, uint8_t target, uint8_t port, uint8_t source,  uint8_t len, byte data[8]) {
-        uint32_t addr = ahbCanAddrAssemble(type, cmd, target, port, source);
+bool AHB_CAN::ahbSend_V(uint8_t type, uint8_t dev_type, uint8_t target, uint8_t msg_type, uint8_t source,  uint8_t len, byte data[8]) {
+        uint32_t addr = ahbCanAddrAssemble(type, dev_type, target, msg_type, source);
         if(addr == 0){ 
           //Serial.println(F("TX Message send addr=0"));
           return false;
