@@ -26,15 +26,15 @@
 
 #ifndef AHB_CAN__C
 #define AHB_CAN__C
-    #include "ahb_comm_CAN.h"
-    #include "ahb_proto.h"
-    #include <mcp_can_coryjfowler.h>
-    #include <SPI.h>
+#include "ahb_comm_CAN.h"
+#include "ahb_proto.h"
+#include <mcp_can_coryjfowler.h>
+#include <SPI.h>
 
-    volatile bool ahb_CANIntReq=false;
+volatile bool ahb_CANIntReq=false;
 
 void ahb_CANInt() {
-      ahb_CANIntReq=true;
+        ahb_CANIntReq=true;
 }
 
     /*
@@ -74,19 +74,19 @@ void AHB_CAN::mcp2515_reset(void){
 }
 
 uint8_t AHB_CAN::checkError(void){
-  return _interface.checkError();
+        return _interface.checkError();
 }
             
 uint8_t AHB_CAN::errorCountRX(void){
-  return _interface.errorCountRX();
+        return _interface.errorCountRX();
 }
             
 uint8_t AHB_CAN::errorCountTX(void){
-  return _interface.errorCountTX();
+        return _interface.errorCountTX();
 }
 
 uint8_t AHB_CAN::getError(void){
-  return _interface.getError();
+        return _interface.getError();
 }
 
 byte AHB_CAN::begin() {
@@ -99,33 +99,27 @@ byte AHB_CAN::begin() {
         if(lastErr == CAN_OK) {_interface.setMode(MCP_NORMAL); Serial.println("_interface.setMode(MCP_NORMAL);");}
  
       
-//_interface.init_Mask(0,1,0x000FF000);                       // Init first mask...
-//_interface.init_Filt(0,1,0x00000000);   // Init first filter...
-//_interface.init_Filt(1,1,0x00013000);                       // Init second filter...
-//_interface.init_Mask(1,1,0x000FF000);                       // Init second mask...   
-//_interface.init_Filt(2,1,0x00000000);                       // Init 3 filter...
-//_interface.init_Filt(3,1,0x00013000);                       // Init 4 filter...
-//_interface.init_Filt(4,1,0x00000000);  //Кому 0 узлу бродкаст                  // Init 5 filter...
-//_interface.init_Filt(5,1,0x00013000);  //Кому 19 узлу                     // Init 6 filter...
+        //_interface.init_Mask(0,1,0x000FF000);                       // Init first mask...
+        //_interface.init_Filt(0,1,0x00000000);   // Init first filter...
+        //_interface.init_Filt(1,1,0x00013000);                       // Init second filter...
+        //_interface.init_Mask(1,1,0x000FF000);                       // Init second mask...   
+        //_interface.init_Filt(2,1,0x00000000);                       // Init 3 filter...
+        //_interface.init_Filt(3,1,0x00013000);                       // Init 4 filter...
+        //_interface.init_Filt(4,1,0x00000000);  //Кому 0 узлу бродкаст                  // Init 5 filter...
+        //_interface.init_Filt(5,1,0x00013000);  //Кому 19 узлу                     // Init 6 filter...
 
-/*
-void initCAN() {
-    // TODO: make baud rate variable
-  while(CAN.begin(CAN_500KBPS)!=0) delay(1000);
-
-  CAN.init_Mask(0,0, 0x007E); // allow two consecutive ids
-  CAN.init_Filt(0,0, getNodeId()); // RxPDO and SDO
-  CAN.init_Filt(1,0, getNodeId()); // same
-
-  CAN.init_Mask(1,0, 0x07FF);
-  CAN.init_Filt(2,0, 0x0000); // NMT
-  CAN.init_Filt(3,0, 0x0080); // sync
-  CAN.init_Filt(4,0, 0x0100); // time stamp
-  CAN.init_Filt(5,0, 0x0000); // dummy
-}        
-*/
-        
-
+        /*
+        // TODO: make baud rate variable
+        while(CAN.begin(CAN_500KBPS)!=0) delay(1000);
+        CAN.init_Mask(0,0, 0x007E); // allow two consecutive ids
+        CAN.init_Filt(0,0, getNodeId()); // RxPDO and SDO
+        CAN.init_Filt(1,0, getNodeId()); // same
+        CAN.init_Mask(1,0, 0x07FF);
+        CAN.init_Filt(2,0, 0x0000); // NMT
+        CAN.init_Filt(3,0, 0x0080); // sync
+        CAN.init_Filt(4,0, 0x0100); // time stamp
+        CAN.init_Filt(5,0, 0x0000); // dummy       
+        */
         
         #ifdef AHB_DEBUG
         if(lastErr == CAN_OK) {Serial.println(F("CAN OK"));}
@@ -142,12 +136,12 @@ void initCAN() {
 }
 
 uint8_t AHB_CAN::address_network_get(uint8_t i){
-    return all_network_address[i];   
+        return all_network_address[i];   
 }
 
 uint8_t AHB_CAN::net_size_get(void){
-//Serial.print("Net Size - "); Serial.println(net_size);
-return net_size;
+        //Serial.print("Net Size - "); Serial.println(net_size);
+        return net_size;
 }
 
 uint8_t AHB_CAN::busType(){
@@ -175,7 +169,6 @@ DD (0-F/0-F) 256 values from struct - type message //Service message, command an
 CC (0-F/0-F) 256 values from struct - target address
 B (0-F) 16 values from struct - port
 AA (0-F/0-F) 256 values from struct - source address
-
 */
 uint32_t AHB_CAN::ahbCanAddrAssemble(ahbMeta meta) {
         return ahbCanAddrAssemble(meta.type, 0,meta.target, meta.port, meta.source);
@@ -184,39 +177,6 @@ uint32_t AHB_CAN::ahbCanAddrAssemble(ahbMeta meta) {
 uint32_t AHB_CAN::ahbCanAddrAssemble(uint8_t type, uint8_t target, uint8_t source) {
         return ahbCanAddrAssemble(type, 0,target, -1, source);
 }
-
-/**
-uint32_t AHB_CAN::ahbCanAddrAssemble(uint8_t f_type, uint8_t f_cmd, uint8_t f_target, uint8_t f_port, uint8_t f_source) {
-          uint32_t addr = 0x80000000;
-
-          //Проверка на корректность передаваемых данных
-          if(f_type == AHB_PKGTYPE_UNICAST) {
-            if(f_target > 255) {
-              //Serial.println("f_target > 255");
-              return 0;
-            }
-            if(f_port < 0 || f_port > 15) {
-              //Serial.println("f_port < 0 || f_port > 15");
-              return 0;
-            }
-          }
-          else{
-            if(f_target > 255) {
-              //Serial.println("f_target > 255");
-              return 0;
-            }
-          }
-
-          if(f_source > 255) {
-            //Serial.println("f_source > 255");
-            return 0;
-          }
-          
-          addr = (f_type & 0xFFFFFFFF)<<28 | (f_cmd & 0xFFFFFFFF)<<20 | (f_target & 0xFFFFFFFF)<<12 | (f_port & 0xFFFFFFFF)<<8 | f_source ;
-
-          return addr;
-}
-*/
 
 //uint32_t AHB_CAN::ahbCanAddrAssemble(uint8_t f_type, uint8_t f_cmd, uint8_t f_target, uint8_t f_port, uint8_t f_source) {
 uint32_t AHB_CAN::ahbCanAddrAssemble(bool priority, uint8_t dev_type, uint8_t f_target, uint8_t msg_type, uint8_t f_source) {
@@ -293,42 +253,6 @@ bool AHB_CAN::ahbSend_V(uint8_t type, uint8_t cmd, uint8_t target, uint8_t port,
         return true;
 }
 
-/**
-ahbMeta AHB_CAN::ahbCanAddrParse(uint32_t rxId_can) {
-
-        ahbMeta temp;
-        temp.target = 0;
-        temp.source = 0;
-        temp.port = 0;
-      
-        //length, buf = data byte(s)
-        uint8_t  f_cmd;
-        bool can_frame_type, can_ID_type, RTR_11BIT;
-        can_ID_type    = (rxId_can & 0x80000000)>>31;  //извлекаем тип ID        (0 - 11bit, 1 - 29 bit)
-        can_frame_type = (rxId_can & 0x40000000)>>30;  //извлекаем тип СAN FRAME (0 - Data,  1 - Remote)   
-        if (can_frame_type && ((rxId_can & 0x20000000)>>29)) RTR_11BIT = 1;
-        else RTR_11BIT = 0;                            //если 29 бит единичка, то это RTR 11 бит
-        temp.type  = (rxId_can & 0x10000000)>>28; //  извлекаем 1-битный идентификатор запроса-ответа из ID       
-        temp.cmd = (rxId_can &   0xFF00000)>>20;  //  извлекаем 4-битный идентификатор сообщения из ID         
-        temp.target  = (rxId_can &  0xFF000)>>12; //  извлекаем 8-битный адрес отправителя из ID - от кого
-        temp.port = (rxId_can &   0xF00)>>8;      //  извлекаем 8-битный адрес получателя из ID - кому
-        temp.source  = (rxId_can &   0xFF);       //  извлекаем 8-битный тип устройства у получателя из ID
-        
-        #ifdef AHB_DEBUG
-          Serial.println(F(" ----------------------------------------------------------")); 
-          //Serial.print(F("RX ---> ADDR - ")); Serial.println(rxId_can, HEX);
-          Serial.print(F("RX --->  "));Serial.print("   ");
-          Serial.print(F(" - Type: 0x"));Serial.print(temp.type);
-          Serial.print(F(" - CMD: 0x"));Serial.print(temp.cmd);
-          Serial.print(F("  Target: 0x"));Serial.print(temp.target);
-          Serial.print(F("  Port: 0x"));Serial.print(temp.port);
-          Serial.print(F("  Source: 0x"));Serial.print(temp.source);               
-        #endif
-
-        return temp;
-}
-*/
-
 ahbMeta AHB_CAN::ahbCanAddrParse(uint32_t rxId_can) {
 
         ahbMeta temp;
@@ -400,6 +324,8 @@ bool AHB_CAN::ahbReceive_V(ahbPacket &pkg) {
         #ifdef AHB_DEBUG  
         Serial.print(F("  Length: 0x"));
         Serial.print(len);
+        Serial.print(F("  pkg.len Length: 0x"));
+        Serial.println(pkg.len);
         #endif //AHB_DEBUG 
         
         for(byte i=0; i<len; i++){ 
