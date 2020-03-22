@@ -25,57 +25,50 @@ public:
             
             bool nodeBusAttach(AHB *node_bus);
             
-//const byte node_address = node_1_Net_center_PC;                 //1                      // 
-//const byte node_address = node_2_Net_center_oraPi1;             //2                      //
-//const byte node_address = node_3_Net_center_oraPi2;             //3                      //
-//const byte node_address = node_4_Net_center_Due1;               //4                      //
-//const byte node_address = node_5_Net_center_Due2;               //5                      //
-//const byte node_address = node_6_Hallway_net_center;            //6                      //
-//const byte node_address = node_7_Hallway_main;                  //7                      //
-//const byte node_address = node_8_Hallway_light;                 //8                      //
-//const byte node_address = node_9_Kitchen_net_center             //9                      //
-//const byte node_address = node_10_Kitchen_main;                  //10                      //
-//const byte node_address = node_11_Kitchen_light;                 //11                    //
-//const byte node_address = node_12_WC_main;                       //12                    //
-//const byte node_address = node_13_WC_waterleak;                  //13                    //
-//const byte node_address = node_14_Bathroom_main;                 //14                    //
-//const byte node_address = node_15_Boxroom_main;                  //15                    //
-//const byte node_address = node_16_Balcony_meteo;                 //16                    //      
-//const byte node_address = node_17_Loggia_main;                   //17                    //         
-//const byte node_address = node_18_Loggia_recuperator;            //18                    //
-//const byte node_address = node_19_Livingroom_main;               //19                    //           
-//const byte node_address = node_20_Bedroom_main;                  //20                    //         
-//const byte node_address = node_21_Cabinet_main;                  //21                    //    
+            //const byte node_address = node_1_Net_center_PC;                 //1                      // 
+            //const byte node_address = node_2_Net_center_oraPi1;             //2                      //
+            //const byte node_address = node_3_Net_center_oraPi2;             //3                      //
+            //const byte node_address = node_4_Net_center_Due1;               //4                      //
+            //const byte node_address = node_5_Net_center_Due2;               //5                      //
+            //const byte node_address = node_6_Hallway_net_center;            //6                      //
+            //const byte node_address = node_7_Hallway_main;                  //7                      //
+            //const byte node_address = node_8_Hallway_light;                 //8                      //
+            //const byte node_address = node_9_Kitchen_net_center             //9                      //
+            //const byte node_address = node_10_Kitchen_main;                  //10                      //
+            //const byte node_address = node_11_Kitchen_light;                 //11                    //
+            //const byte node_address = node_12_WC_main;                       //12                    //
+            //const byte node_address = node_13_WC_waterleak;                  //13                    //
+            //const byte node_address = node_14_Bathroom_main;                 //14                    //
+            //const byte node_address = node_15_Boxroom_main;                  //15                    //
+            //const byte node_address = node_16_Balcony_meteo;                 //16                    //      
+            //const byte node_address = node_17_Loggia_main;                   //17                    //         
+            //const byte node_address = node_18_Loggia_recuperator;            //18                    //
+            //const byte node_address = node_19_Livingroom_main;               //19                    //           
+            //const byte node_address = node_20_Bedroom_main;                  //20                    //         
+            //const byte node_address = node_21_Cabinet_main;                  //21                    //    
 
-// Выбираем адрес мастера (из списка выше)------------------//
-//                                                          //
-byte SendAddrStatus_master = node_4_Net_center_Due1;        //
-//                                                         //
-// Выбираем адрес узла мониторинга (из списка выше)---------//
-//                                                          //
-byte MonitoringAddr = node_1_Net_center_PC;                 //
-//----------------------------------------------------------//
-bool TimerStatus = 0;
-bool sendparameters = 0;
+            // Выбираем адрес мастера (из списка выше)------------------//
+            //                                                          //
+            byte SendAddrStatus_master = node_4_Net_center_Due1;        //
+            //                                                         //
+            // Выбираем адрес узла мониторинга (из списка выше)---------//
+            //                                                          //
+            byte MonitoringAddr = node_1_Net_center_PC;                 //
+            //----------------------------------------------------------//
+            bool TimerStatus = 0;
+            bool sendparameters = 0;
 
-// настраиваем отладку-------------------------------------------------------------------------------// 
-                                                                                                     //
-#define debug                   //отладка в сериал_монитор. Закоментировать строку, если не нужна    //
-#ifdef debug                                                                                         //
-#define debugStatus             //флаг вывода таблицы статусов узлов CAN сети (для МАСТЕРА)          //
-const bool statusprint =     0; //флаг распечатки принятых/отправленных статусов.                    //
-const bool RXparametrprint = 0; //флаг распечатки принятых параметров.                               //
-const bool TXparametrprint = 0; //флаг распечатки отправленных параметров.                           //
-const bool errors =          0; //флаг распечатки ошибок MCP2515.                                    //                                                                                //
-#endif                                                                                               //
-//---------------------------------------------------------------------------------------------------//
-
-// системные часы на миллис
-//uint8_t ss = 0;
-//uint8_t mm = 0;
-//uint8_t hh = 0;
-//uint8_t dd = 0;
-//uint32_t prevSystemtime = 0;
+            // настраиваем отладку-------------------------------------------------------------------------------// 
+                                                                                                                 //
+            #define debug                   //отладка в сериал_монитор. Закоментировать строку, если не нужна    //
+            #ifdef debug                                                                                         //
+            #define debugStatus             //флаг вывода таблицы статусов узлов CAN сети (для МАСТЕРА)          //
+            const bool statusprint =     0; //флаг распечатки принятых/отправленных статусов.                    //
+            const bool RXparametrprint = 0; //флаг распечатки принятых параметров.                               //
+            const bool TXparametrprint = 0; //флаг распечатки отправленных параметров.                           //
+            const bool errors =          0; //флаг распечатки ошибок MCP2515.                                    //                                                                                //
+            #endif                                                                                               //
+            //---------------------------------------------------------------------------------------------------//
 
 // ЗАДАЁМ СПИСОК НАЗВАНИЙ (АДРЕСОВ) ВСЕХ УЗЛОВ, ПАРАМЕТРОВ И ДЕВАЙСОВ СИСТЕМЫ  SmartHomeCAN
             
@@ -423,6 +416,7 @@ const bool errors =          0; //флаг распечатки ошибок MCP
             // ЗАДАЁМ ТАБЛИЦУ (МАССИВ) ИСПОЛНИТЕЛЬНЫХ МЕХАНИЗМОВ (девайсы, которые присутствуют на данном узле) ,т.е. это уже конфигурация - эта информация на каждом узле будет своя
             // названия (типы)девайсов берём из файла name_addresses.h
             #define device_quantity sizeof(device)/5
+            
             byte device [4][5] = {
               {255,6,6,6,6}, // этy строку не трогаем
               //     девайс          состояние  пин ардуино, куда  пин ардуино             вид         
@@ -522,192 +516,189 @@ const bool errors =          0; //флаг распечатки ошибок MCP
             unsigned long curMillis = 0;      //снимок машинного времени
 
 //Для DEBUG NODE
-
 #ifdef debug
 
-#define TypeDEV 1
-#define TypeMES 2
-#define ADDR    3
-#define PAR     4
-#define COM     5
+            #define TypeDEV 1
+            #define TypeMES 2
+            #define ADDR    3
+            #define PAR     4
+            #define COM     5
 
+            #define  BUF_LENGTH 100
+            char buf[BUF_LENGTH]; // буффер для работы прогмем, если нужны строки более 100 символов, тут ставим бОльшее значение
 
-
-#define  BUF_LENGTH 100
-char buf[BUF_LENGTH]; // буффер для работы прогмем, если нужны строки более 100 символов, тут ставим бОльшее значение
-
-const char stringMES_0[1] PROGMEM = "NULL_C"; 
-const char stringMES_1[1] PROGMEM = "КОМАНДА";                 //= "COMMAND";    
-const char stringMES_2[1] PROGMEM = "ОТЧЁТ О КОМАНДЕ";         //= "COMMAND_REPORT";  
-const char stringMES_3[1] PROGMEM = "ЗАПРОС ПАРАМЕТРА";        //= "PARAMETER_REQUEST";  
-const char stringMES_4[1] PROGMEM = "ПАРАМЕТР";                //= "PARAMETER"; 
-const char stringMES_5[1] PROGMEM = "ЗАПРОС СТАТУСА";          //= "STATUS_REQUEST";    
-const char stringMES_6[1] PROGMEM = "СТАТУС";                  //= "STATUS";   
-const char stringMES_7[1] PROGMEM = "ЗАПРОС МУЛЬТИКАДРА";      //= "MULTIFRAME_REQUEST";
-const char stringMES_8[1] PROGMEM = "МУЛЬТИКАДР";              //= "MULTIFRAME";   
-const char stringMES_9[1] PROGMEM = "КОНЕЦ МУЛЬТИКАДРА";       //= "MULTIFRAME_END";
-const char stringMES_10[1] PROGMEM = "АВАРИЯ";                 //= "ACCIDENT";  
-const char stringMES_11[1] PROGMEM = "АВАРИЯ ПРИНЯТА";         //= "ACCIDENT_REPORT";
+            const char stringMES_0[1] PROGMEM = "NULL_C"; 
+            const char stringMES_1[1] PROGMEM = "КОМАНДА";                 //= "COMMAND";    
+            const char stringMES_2[1] PROGMEM = "ОТЧЁТ О КОМАНДЕ";         //= "COMMAND_REPORT";  
+            const char stringMES_3[1] PROGMEM = "ЗАПРОС ПАРАМЕТРА";        //= "PARAMETER_REQUEST";  
+            const char stringMES_4[1] PROGMEM = "ПАРАМЕТР";                //= "PARAMETER"; 
+            const char stringMES_5[1] PROGMEM = "ЗАПРОС СТАТУСА";          //= "STATUS_REQUEST";    
+            const char stringMES_6[1] PROGMEM = "СТАТУС";                  //= "STATUS";   
+            const char stringMES_7[1] PROGMEM = "ЗАПРОС МУЛЬТИКАДРА";      //= "MULTIFRAME_REQUEST";
+            const char stringMES_8[1] PROGMEM = "МУЛЬТИКАДР";              //= "MULTIFRAME";   
+            const char stringMES_9[1] PROGMEM = "КОНЕЦ МУЛЬТИКАДРА";       //= "MULTIFRAME_END";
+            const char stringMES_10[1] PROGMEM = "АВАРИЯ";                 //= "ACCIDENT";  
+            const char stringMES_11[1] PROGMEM = "АВАРИЯ ПРИНЯТА";         //= "ACCIDENT_REPORT";
  
-const char* const string_tableMES[12] PROGMEM = {stringMES_0, stringMES_1, 
-stringMES_2, stringMES_3, stringMES_4,  stringMES_5, stringMES_6,
-stringMES_7, stringMES_8, stringMES_9, stringMES_10, stringMES_11};
+            const char* const string_tableMES[12] PROGMEM = {stringMES_0, stringMES_1, 
+            stringMES_2, stringMES_3, stringMES_4,  stringMES_5, stringMES_6,
+            stringMES_7, stringMES_8, stringMES_9, stringMES_10, stringMES_11};
 
-const char stringADDR_0[1]  PROGMEM = "ШИРОКОВЕЩАТЕЛЬНО           ";
-const char stringADDR_1[1]  PROGMEM = "node_1_Net_center_PC       ";
-const char stringADDR_2[1]  PROGMEM = "node_2_Net_center_oraPi1   ";  
-const char stringADDR_3[1]  PROGMEM = "node_3_Net_center_oraPi2   "; 
-const char stringADDR_4[1]  PROGMEM = "node_4_Net_center_Due1     ";
-const char stringADDR_5[1]  PROGMEM = "node_5_Net_center_Due2     ";    
-const char stringADDR_6[1]  PROGMEM = "node_6_Hallway_net_center  ";
-const char stringADDR_7[1]  PROGMEM = "node_7_Hallway_main        ";  
-const char stringADDR_8[1]  PROGMEM = "node_8_Hallway_light       ";
-const char stringADDR_9[1]  PROGMEM = "node_9_Kitchen_net_center  ";
-const char stringADDR_10[1] PROGMEM = "node_10_Kitchen_main       ";
-const char stringADDR_11[1] PROGMEM = "node_11_Kitchen_light      ";
-const char stringADDR_12[1] PROGMEM = "node_12_WC_main            ";
-const char stringADDR_13[1] PROGMEM = "node_13_WC_waterleak       ";         
-const char stringADDR_14[1] PROGMEM = "node_14_Bathroom_main      ";  
-const char stringADDR_15[1] PROGMEM = "node_15_Boxroom_main       ";
-const char stringADDR_16[1] PROGMEM = "node_16_Balcony_meteo      ";
-const char stringADDR_17[1] PROGMEM = "node_17_Loggia_main        ";
-const char stringADDR_18[1] PROGMEM = "node_18_Loggia_recuperator ";              
-const char stringADDR_19[1] PROGMEM = "node_19_Livingroom_main    ";               
-const char stringADDR_20[1] PROGMEM = "node_20_Bedroom_main       ";                 
-const char stringADDR_21[1] PROGMEM = "node_21_Cabinet_main       ";               
-
-
-const char* const string_tableADDR[22] PROGMEM = {stringADDR_0, stringADDR_1, stringADDR_2, stringADDR_3, stringADDR_4,   // здесь массив строк отчетов
-stringADDR_5,  stringADDR_6,  stringADDR_7,  stringADDR_8,  stringADDR_9, stringADDR_10,stringADDR_11,stringADDR_12,stringADDR_13, 
-stringADDR_14, stringADDR_15, stringADDR_16, stringADDR_17, stringADDR_18,stringADDR_19,stringADDR_20,stringADDR_21};
-
-const char stringPAR_0[1] PROGMEM = "NULL PARAMETER"; //0 
-const char stringPAR_1[1] PROGMEM = "ДАТЧИК ТЕМПЕРАТУРЫ ВОЗДУХА"; //1 air_temperature_censor
-const char stringPAR_2[1] PROGMEM = "ДАТЧИК ВЛАЖНОСТИ ВОЗДУХА"; //2 air_humidity_censor
-const char stringPAR_3[1] PROGMEM = "ДАТЧИК ДАВЛЕНИЯ ВОДУХА"; //3 air_pressure_censor
-const char stringPAR_4[1] PROGMEM = "ДАТЧИК ДВИЖЕНИЯ ПИРОЭЛЕКТРИЧЕСКИЙ (ИК)"; //4 motion_pir_censor
-const char stringPAR_5[1] PROGMEM = "ДАТЧИК ДВИЖЕНИЯ МИКРОВОЛНОВОЙ"; //5  motion_mw_censor
-const char stringPAR_6[1] PROGMEM = "ДАТЧИК ВИБРАЦИИ"; //6 vibration_censor
-const char stringPAR_7[1] PROGMEM = "ДАТЧИК ШУМА"; //7  noise_censor
-const char stringPAR_8[1] PROGMEM = "ДАТЧИК ОСВЕЩЁННОСТИ"; // Illumination_censor
-const char stringPAR_9[1] PROGMEM = "ДАТЧИК ГАЗА CO"; //9  gas_co_censor
-const char stringPAR_10[1] PROGMEM = "ДАТЧИК ГАЗА CO2"; //10 gas_co2_censor
-const char stringPAR_11[1] PROGMEM = "ДАТЧИК МЕТАНА"; //11 gas_metan_censor 
-const char stringPAR_12[1] PROGMEM = "ДАТЧИК КУРЕНИЯ"; //12  smoke_censor
-const char stringPAR_13[1] PROGMEM = "ДАТЧИК ОГНЯ"; //13  fire_censor
-const char stringPAR_14[1] PROGMEM = "ДАТЧИК ТЕМПЕРАТУРЫ ТЕЛА"; //14  body_temperature_censor
-const char stringPAR_15[1] PROGMEM = "ДАТЧИК ОТРКРЫТИЯ ЖАЛЮЗИ"; //15  jalousie_status_censor 
-const char stringPAR_16[1] PROGMEM = "ДАТЧИК ПАРА"; //16 steam_censor
-const char stringPAR_17[1] PROGMEM = "ДАТЧИК ИЗЛУЧЕНИЯ МИКРОВОЛНОВОЙ"; //17 microwave_censor
-const char stringPAR_18[1] PROGMEM = "ДАТЧИК ТЕМПЕРАТУРЫ ХОЛОДИЛЬНИКА"; //18 fridge_temperature_censor
-const char stringPAR_19[1] PROGMEM = "ДАТЧИК ТЕМПЕРАТУРЫ МОРОЗИЛКА"; // 19 freezer_temperature_censor
-const char stringPAR_20[1] PROGMEM = "ДАТЧИК ТЕМПЕРАТУРЫ ДУХОВКА"; // 20 oven_temperature_censor
-const char stringPAR_21[1] PROGMEM = "ДАТЧИК ЗАКРЫТИЯ ЭЛЕКТРОЩИТА"; // 21 electrical_board_censor
-const char stringPAR_22[1] PROGMEM = "ДАТЧИК ЗАКРЫТИЯ ЗАМКА ДВЕРИ"; // 22 door_lock_censor
-const char stringPAR_23[1] PROGMEM = "ДАТЧИК ЗАКРЫТИЯ ДВЕРИ"; // 23 door_close_censor
-const char stringPAR_24[1] PROGMEM = "ДАТЧИК ПРОХОДА 1"; // 24 motion_door1_censor
-const char stringPAR_25[1] PROGMEM = "ДАТЧИК ПРОХОДА 2"; //25 motion_door2_censor
-const char stringPAR_26[1] PROGMEM = "ДАТЧИК ЗАКРЫТИЯ ОКНА"; // 26 window_close_censor
-const char stringPAR_27[1] PROGMEM = "ДАТЧИК ТЕМПЕРАТУРЫ ГОРЯЧЕЙ ВОДЫ"; // 27 water_hot_temperature_censor 
-const char stringPAR_28[1] PROGMEM = "ДАТЧИК ТЕМПЕРАТУРЫ ХОЛОДНОЙ ВОДЫ"; // 28 water_cold_temperature_censor
-const char stringPAR_29[1] PROGMEM = "ДАТЧИК ДАВЛЕНИЯ ГОРЯЧЕЙ ВОДЫ"; // 29 water_hot_pressure_censor
-const char stringPAR_30[1] PROGMEM = "ДАТЧИК ДАВЛЕНИЯ ХОЛОДНОЙ ВОДЫ"; // 3 0water_cold_pressure_censor
-const char stringPAR_31[1] PROGMEM = "ДАТЧИК ПРОТЕЧКИ"; // 31 leakage_censor
-const char stringPAR_32[1] PROGMEM = "ДАТЧИК ВКЛЮЧЕНИЯ ЛАМПЫ АКВАРИУМА"; //46 lamp_aquarium_censor
-const char stringPAR_33[1] PROGMEM = "ДАТЧИК ТЕМПЕРАТУРЫ АКВАРИУМА"; //47 aquarium_temperature_censor
-const char stringPAR_34[1] PROGMEM = "ДАТЧИК ВКЛЮЧЕНИЯ НАСОСА АКВАРИУМА"; //48 aquarium_pump_censor
-const char stringPAR_35[1] PROGMEM = "ДАТЧИК ВКЛЮЧЕНИЯ ФИЛЬТРА ОЧИСТКИ АКВАРИУМА"; //49 aquarium_clearing_censor
-const char stringPAR_36[1] PROGMEM = "ДАТЧИК ЗАКРЫТИЯ ДВЕРИ ШКАФА";  //36 cupboard_door_censor
-const char stringPAR_37[1] PROGMEM = "ДАТЧИК ЗАКРЫТИЯ ДВЕРИ СЕЙФА"; //37 safe_door_censor
-const char stringPAR_38[1] PROGMEM = "ДАТЧИК ЗАКРЫТИЯ ДВЕРИ БАЛКОНА"; //38 balcony_door_censor
-const char stringPAR_39[1] PROGMEM = "ДАТЧИК ЗАКРЫТИЯ ДВЕРИ ЛОДЖИИ"; // 39 loggia_door_censor
-const char stringPAR_40[1] PROGMEM = "ДАТЧИК ТЕМПЕРАТУРЫ БАТАРЕИ"; //40 radiator_temperature_censor
-const char stringPAR_41[1] PROGMEM = "ДАТЧИК ВКЛЮЧЕНИЯ ЛАМПЫ НА ПОТОЛКЕ"; //41 lamp_ceiling_censor
-const char stringPAR_42[1] PROGMEM = "ДАТЧИК ВКЛЮЧЕНИЯ НАСТЕННОЙ ЛАМПЫ"; //42 lamp_wall_censor
-const char stringPAR_43[1] PROGMEM = "ДАТЧИК ВКЛЮЧЕНИЯ ЛАМПЫ ПОДСВЕТКИ"; //43 lamp_Illumination_censor
-const char stringPAR_44[1] PROGMEM = "ДАТЧИК ВКЛЮЧЕНИЯ АВАРИЙНАЯ ЛАМПЫ"; //44 lamp_accident_censor
-const char stringPAR_45[1] PROGMEM = "ДАТЧИК ВЛАЖНОСТИ ЗЕМЛИ"; //45 earth_humidity_censor
-const char stringPAR_46[1] PROGMEM = "СЧЕТЧИК ГАЗА"; //32 counter_gas_censor
-const char stringPAR_47[1] PROGMEM = "";                    //47 сервис байт
-const char stringPAR_48[1] PROGMEM = "СЧЕТЧИК ГОРЯЧЕЙ ВОДЫ"; // 33 counter_water_hot_censor
-const char stringPAR_49[1] PROGMEM = "";                     //49 сервис байт
-const char stringPAR_50[1] PROGMEM = "СЧЕТЧИК ХОЛОДНОЙ ВОДЫ"; // 34 counter_water_hot_censor
-const char stringPAR_51[1] PROGMEM = "";                    //51 сервис байт
-const char stringPAR_52[1] PROGMEM = "СЧЕТЧИК ЭЛЕКТРОЭНЕРГИИ"; // 35 counter_electricity_censor
-const char stringPAR_53[1] PROGMEM = "";                    //53 сервис байт
-const char stringPAR_54[1] PROGMEM = "";                    //54 сервис байт
-const char stringPAR_55[1] PROGMEM = "";                    //55 сервис байт
-
-const char stringPAR_56[1] PROGMEM = "НАПРЯЖЕНИЕ АКБ ИБП"; // 35 counter_electricity_censor
-const char stringPAR_57[1] PROGMEM = "";                    //57 сервис байт
-const char stringPAR_58[1] PROGMEM = "";                    //58 сервис байт
-const char stringPAR_59[1] PROGMEM = "";                    //59 сервис байт
+            const char stringADDR_0[1]  PROGMEM = "ШИРОКОВЕЩАТЕЛЬНО           ";
+            const char stringADDR_1[1]  PROGMEM = "node_1_Net_center_PC       ";
+            const char stringADDR_2[1]  PROGMEM = "node_2_Net_center_oraPi1   ";  
+            const char stringADDR_3[1]  PROGMEM = "node_3_Net_center_oraPi2   "; 
+            const char stringADDR_4[1]  PROGMEM = "node_4_Net_center_Due1     ";
+            const char stringADDR_5[1]  PROGMEM = "node_5_Net_center_Due2     ";    
+            const char stringADDR_6[1]  PROGMEM = "node_6_Hallway_net_center  ";
+            const char stringADDR_7[1]  PROGMEM = "node_7_Hallway_main        ";  
+            const char stringADDR_8[1]  PROGMEM = "node_8_Hallway_light       ";
+            const char stringADDR_9[1]  PROGMEM = "node_9_Kitchen_net_center  ";
+            const char stringADDR_10[1] PROGMEM = "node_10_Kitchen_main       ";
+            const char stringADDR_11[1] PROGMEM = "node_11_Kitchen_light      ";
+            const char stringADDR_12[1] PROGMEM = "node_12_WC_main            ";
+            const char stringADDR_13[1] PROGMEM = "node_13_WC_waterleak       ";         
+            const char stringADDR_14[1] PROGMEM = "node_14_Bathroom_main      ";  
+            const char stringADDR_15[1] PROGMEM = "node_15_Boxroom_main       ";
+            const char stringADDR_16[1] PROGMEM = "node_16_Balcony_meteo      ";
+            const char stringADDR_17[1] PROGMEM = "node_17_Loggia_main        ";
+            const char stringADDR_18[1] PROGMEM = "node_18_Loggia_recuperator ";              
+            const char stringADDR_19[1] PROGMEM = "node_19_Livingroom_main    ";               
+            const char stringADDR_20[1] PROGMEM = "node_20_Bedroom_main       ";                 
+            const char stringADDR_21[1] PROGMEM = "node_21_Cabinet_main       ";               
 
 
-const char* const string_tablePAR[60] PROGMEM = {stringPAR_0, stringPAR_1, stringPAR_2, stringPAR_3, stringPAR_4,   // здесь массив строк отчетов
-stringPAR_5,  stringPAR_6,  stringPAR_7,  stringPAR_8,  stringPAR_9, stringPAR_10,stringPAR_11,stringPAR_12,stringPAR_13, 
-stringPAR_14, stringPAR_15, stringPAR_16, stringPAR_17, stringPAR_18,stringPAR_19,stringPAR_20,stringPAR_21,stringPAR_22, 
-stringPAR_23, stringPAR_24, stringPAR_25, stringPAR_26, stringPAR_27,stringPAR_28,stringPAR_29,stringPAR_30,stringPAR_31,
-stringPAR_32, stringPAR_33, stringPAR_34, stringPAR_35, stringPAR_36,stringPAR_37,stringPAR_38,stringPAR_39,stringPAR_40,
-stringPAR_41, stringPAR_42, stringPAR_43, stringPAR_44, stringPAR_45,stringPAR_46,stringPAR_47,stringPAR_48,stringPAR_49,
-stringPAR_50, stringPAR_51, stringPAR_52, stringPAR_53, stringPAR_54,stringPAR_55,stringPAR_56,stringPAR_57,stringPAR_58,
-stringPAR_59};
+            const char* const string_tableADDR[22] PROGMEM = {stringADDR_0, stringADDR_1, stringADDR_2, stringADDR_3, stringADDR_4,   // здесь массив строк отчетов
+            stringADDR_5,  stringADDR_6,  stringADDR_7,  stringADDR_8,  stringADDR_9, stringADDR_10,stringADDR_11,stringADDR_12,stringADDR_13, 
+            stringADDR_14, stringADDR_15, stringADDR_16, stringADDR_17, stringADDR_18,stringADDR_19,stringADDR_20,stringADDR_21};
 
-const char stringDEV_0[1] PROGMEM = "NULL DEVICE";
-const char stringDEV_1[1] PROGMEM = "ЛАМПА НА ПОТОЛКЕ БУЛЕВАЯ"; //64 lamp_ceiling_onoff_device
-const char stringDEV_2[1] PROGMEM = "ЛАМПА НАСТЕННАЯ БУЛЕВАЯ"; //65 lamp_wall_onoff_device
-const char stringDEV_3[1] PROGMEM = "ЛАМПА ПОДСВЕТКИ БУЛЕВАЯ"; //66 lamp_Illumination_onoff_PARice
-const char stringDEV_4[1] PROGMEM = "ЛАМПА АВАРИЙНАЯ БУЛЕВАЯ"; //67 lamp_accident_onoff_device
-const char stringDEV_5[1] PROGMEM = "ЛАМПА НА ПОТОЛКЕ ДИММЕР"; //68 lamp_ceiling_dimm_device
-const char stringDEV_6[1] PROGMEM = "ЛАМПА НА СТЕНЕ ДИММЕР"; //69 lamp_wall_dimm_device 
-const char stringDEV_7[1] PROGMEM = "ЛАМПА ПОДСВЕТКИ ДИММЕР"; //70 lamp_Illumination_dimm_device
-const char stringDEV_8[1] PROGMEM = "ЛАМПА АВАРИЙНАЯ ДИММЕР"; //71 lamp_accident_dimm_device
-const char stringDEV_9[1] PROGMEM = "ВЕНТИЛЯТОР"; // 72 fan 
-const char stringDEV_10[1] PROGMEM = "РЕКУПЕРАТОР";//73 recuperator
-const char stringDEV_11[1] PROGMEM = "КОНДИЦИОНЕР"; // 74 air_conditioning 
-const char stringDEV_12[1] PROGMEM = "КЛАПАН РАДИАТОРА ОТОПЛЕНИЯ"; // 75 valve_radiator
-const char stringDEV_13[1] PROGMEM = "ЖАЛЮЗИ"        ; // 76 jalousie
-const char stringDEV_14[1] PROGMEM = "КРАН ГАЗА"      ; // 77 valve_gas 
-const char stringDEV_15[1] PROGMEM = "КРАН ГОРЯЧЕЙ ВОДЫ"  ; // 78 valve_hot_water
-const char stringDEV_16[1] PROGMEM = "КРАН ХОЛОДНОЙ ВОДЫ"   ; //79 valve_cold_water
-const char stringDEV_17[1] PROGMEM = "ИК ПРИЕМОПЕРЕДАТЧИК IRDA"               ; // 80 irda
-const char stringDEV_18[1] PROGMEM = "ОСВЕЖИТЕЛЬ ВОЗДУХА"            ; // 81 freshener
-const char stringDEV_19[1] PROGMEM = "УВЛАЖНИТЕЛЬ ВОЗДУХА"           ; // 82 humidifier 
-const char stringDEV_20[1] PROGMEM = "ЗАМОК ДВЕРИ МАГНИТНЫЙ"      ; // 83 door_lock_magnet
-const char stringDEV_21[1] PROGMEM = "ЗАМОК ДВЕРИ ЭЛЕКТРОМАГНИТНЫЙ"     ; //84 door_lock_electromagnet 
-const char stringDEV_22[1] PROGMEM = "ЗАМОК ДВЕРИ ЭЛЕКТРОМЕХАНИЧЕСКИЙ"     ;  //85 door_lock_electromechanical
-const char stringDEV_23[1] PROGMEM = "ЗАМОК ДВЕРИ BLINK"        ; // 86  door_lock_blink 
-const char stringDEV_24[1] PROGMEM = "СИРЕНА"                  ; // 87 siren
-const char stringDEV_25[1] PROGMEM = "СТРОБОСКОП МИГАЛКА";  // 88 blinker 
-const char stringDEV_26[1] PROGMEM = "МУЗЫКА";  // 89 music
-const char stringDEV_27[1] PROGMEM = "ТВ"; // 90 tv
-const char stringDEV_28[1] PROGMEM = "РАДИО"; // 91 radio 
-const char stringDEV_29[1] PROGMEM = "РОЗЕТКА";  // 92 power_socket 
+            const char stringPAR_0[1] PROGMEM = "NULL PARAMETER"; //0 
+            const char stringPAR_1[1] PROGMEM = "ДАТЧИК ТЕМПЕРАТУРЫ ВОЗДУХА"; //1 air_temperature_censor
+            const char stringPAR_2[1] PROGMEM = "ДАТЧИК ВЛАЖНОСТИ ВОЗДУХА"; //2 air_humidity_censor
+            const char stringPAR_3[1] PROGMEM = "ДАТЧИК ДАВЛЕНИЯ ВОДУХА"; //3 air_pressure_censor
+            const char stringPAR_4[1] PROGMEM = "ДАТЧИК ДВИЖЕНИЯ ПИРОЭЛЕКТРИЧЕСКИЙ (ИК)"; //4 motion_pir_censor
+            const char stringPAR_5[1] PROGMEM = "ДАТЧИК ДВИЖЕНИЯ МИКРОВОЛНОВОЙ"; //5  motion_mw_censor
+            const char stringPAR_6[1] PROGMEM = "ДАТЧИК ВИБРАЦИИ"; //6 vibration_censor
+            const char stringPAR_7[1] PROGMEM = "ДАТЧИК ШУМА"; //7  noise_censor
+            const char stringPAR_8[1] PROGMEM = "ДАТЧИК ОСВЕЩЁННОСТИ"; // Illumination_censor
+            const char stringPAR_9[1] PROGMEM = "ДАТЧИК ГАЗА CO"; //9  gas_co_censor
+            const char stringPAR_10[1] PROGMEM = "ДАТЧИК ГАЗА CO2"; //10 gas_co2_censor
+            const char stringPAR_11[1] PROGMEM = "ДАТЧИК МЕТАНА"; //11 gas_metan_censor 
+            const char stringPAR_12[1] PROGMEM = "ДАТЧИК КУРЕНИЯ"; //12  smoke_censor
+            const char stringPAR_13[1] PROGMEM = "ДАТЧИК ОГНЯ"; //13  fire_censor
+            const char stringPAR_14[1] PROGMEM = "ДАТЧИК ТЕМПЕРАТУРЫ ТЕЛА"; //14  body_temperature_censor
+            const char stringPAR_15[1] PROGMEM = "ДАТЧИК ОТРКРЫТИЯ ЖАЛЮЗИ"; //15  jalousie_status_censor 
+            const char stringPAR_16[1] PROGMEM = "ДАТЧИК ПАРА"; //16 steam_censor
+            const char stringPAR_17[1] PROGMEM = "ДАТЧИК ИЗЛУЧЕНИЯ МИКРОВОЛНОВОЙ"; //17 microwave_censor
+            const char stringPAR_18[1] PROGMEM = "ДАТЧИК ТЕМПЕРАТУРЫ ХОЛОДИЛЬНИКА"; //18 fridge_temperature_censor
+            const char stringPAR_19[1] PROGMEM = "ДАТЧИК ТЕМПЕРАТУРЫ МОРОЗИЛКА"; // 19 freezer_temperature_censor
+            const char stringPAR_20[1] PROGMEM = "ДАТЧИК ТЕМПЕРАТУРЫ ДУХОВКА"; // 20 oven_temperature_censor
+            const char stringPAR_21[1] PROGMEM = "ДАТЧИК ЗАКРЫТИЯ ЭЛЕКТРОЩИТА"; // 21 electrical_board_censor
+            const char stringPAR_22[1] PROGMEM = "ДАТЧИК ЗАКРЫТИЯ ЗАМКА ДВЕРИ"; // 22 door_lock_censor
+            const char stringPAR_23[1] PROGMEM = "ДАТЧИК ЗАКРЫТИЯ ДВЕРИ"; // 23 door_close_censor
+            const char stringPAR_24[1] PROGMEM = "ДАТЧИК ПРОХОДА 1"; // 24 motion_door1_censor
+            const char stringPAR_25[1] PROGMEM = "ДАТЧИК ПРОХОДА 2"; //25 motion_door2_censor
+            const char stringPAR_26[1] PROGMEM = "ДАТЧИК ЗАКРЫТИЯ ОКНА"; // 26 window_close_censor
+            const char stringPAR_27[1] PROGMEM = "ДАТЧИК ТЕМПЕРАТУРЫ ГОРЯЧЕЙ ВОДЫ"; // 27 water_hot_temperature_censor 
+            const char stringPAR_28[1] PROGMEM = "ДАТЧИК ТЕМПЕРАТУРЫ ХОЛОДНОЙ ВОДЫ"; // 28 water_cold_temperature_censor
+            const char stringPAR_29[1] PROGMEM = "ДАТЧИК ДАВЛЕНИЯ ГОРЯЧЕЙ ВОДЫ"; // 29 water_hot_pressure_censor
+            const char stringPAR_30[1] PROGMEM = "ДАТЧИК ДАВЛЕНИЯ ХОЛОДНОЙ ВОДЫ"; // 3 0water_cold_pressure_censor
+            const char stringPAR_31[1] PROGMEM = "ДАТЧИК ПРОТЕЧКИ"; // 31 leakage_censor
+            const char stringPAR_32[1] PROGMEM = "ДАТЧИК ВКЛЮЧЕНИЯ ЛАМПЫ АКВАРИУМА"; //46 lamp_aquarium_censor
+            const char stringPAR_33[1] PROGMEM = "ДАТЧИК ТЕМПЕРАТУРЫ АКВАРИУМА"; //47 aquarium_temperature_censor
+            const char stringPAR_34[1] PROGMEM = "ДАТЧИК ВКЛЮЧЕНИЯ НАСОСА АКВАРИУМА"; //48 aquarium_pump_censor
+            const char stringPAR_35[1] PROGMEM = "ДАТЧИК ВКЛЮЧЕНИЯ ФИЛЬТРА ОЧИСТКИ АКВАРИУМА"; //49 aquarium_clearing_censor
+            const char stringPAR_36[1] PROGMEM = "ДАТЧИК ЗАКРЫТИЯ ДВЕРИ ШКАФА";  //36 cupboard_door_censor
+            const char stringPAR_37[1] PROGMEM = "ДАТЧИК ЗАКРЫТИЯ ДВЕРИ СЕЙФА"; //37 safe_door_censor
+            const char stringPAR_38[1] PROGMEM = "ДАТЧИК ЗАКРЫТИЯ ДВЕРИ БАЛКОНА"; //38 balcony_door_censor
+            const char stringPAR_39[1] PROGMEM = "ДАТЧИК ЗАКРЫТИЯ ДВЕРИ ЛОДЖИИ"; // 39 loggia_door_censor
+            const char stringPAR_40[1] PROGMEM = "ДАТЧИК ТЕМПЕРАТУРЫ БАТАРЕИ"; //40 radiator_temperature_censor
+            const char stringPAR_41[1] PROGMEM = "ДАТЧИК ВКЛЮЧЕНИЯ ЛАМПЫ НА ПОТОЛКЕ"; //41 lamp_ceiling_censor
+            const char stringPAR_42[1] PROGMEM = "ДАТЧИК ВКЛЮЧЕНИЯ НАСТЕННОЙ ЛАМПЫ"; //42 lamp_wall_censor
+            const char stringPAR_43[1] PROGMEM = "ДАТЧИК ВКЛЮЧЕНИЯ ЛАМПЫ ПОДСВЕТКИ"; //43 lamp_Illumination_censor
+            const char stringPAR_44[1] PROGMEM = "ДАТЧИК ВКЛЮЧЕНИЯ АВАРИЙНАЯ ЛАМПЫ"; //44 lamp_accident_censor
+            const char stringPAR_45[1] PROGMEM = "ДАТЧИК ВЛАЖНОСТИ ЗЕМЛИ"; //45 earth_humidity_censor
+            const char stringPAR_46[1] PROGMEM = "СЧЕТЧИК ГАЗА"; //32 counter_gas_censor
+            const char stringPAR_47[1] PROGMEM = "";                    //47 сервис байт
+            const char stringPAR_48[1] PROGMEM = "СЧЕТЧИК ГОРЯЧЕЙ ВОДЫ"; // 33 counter_water_hot_censor
+            const char stringPAR_49[1] PROGMEM = "";                     //49 сервис байт
+            const char stringPAR_50[1] PROGMEM = "СЧЕТЧИК ХОЛОДНОЙ ВОДЫ"; // 34 counter_water_hot_censor
+            const char stringPAR_51[1] PROGMEM = "";                    //51 сервис байт
+            const char stringPAR_52[1] PROGMEM = "СЧЕТЧИК ЭЛЕКТРОЭНЕРГИИ"; // 35 counter_electricity_censor
+            const char stringPAR_53[1] PROGMEM = "";                    //53 сервис байт
+            const char stringPAR_54[1] PROGMEM = "";                    //54 сервис байт
+            const char stringPAR_55[1] PROGMEM = "";                    //55 сервис байт
 
-const char* const string_tableDEV[30] PROGMEM = {stringDEV_0, stringDEV_1, stringDEV_2, stringDEV_3, stringDEV_4,   // здесь массив строк отчетов
-stringDEV_5,  stringDEV_6,  stringDEV_7,  stringDEV_8,  stringDEV_9, stringDEV_10,stringDEV_11,stringDEV_12,stringDEV_13, 
-stringDEV_14, stringDEV_15, stringDEV_16, stringDEV_17, stringDEV_18,stringDEV_19,stringDEV_20,stringDEV_21,stringDEV_22, 
-stringDEV_23, stringDEV_24, stringDEV_25, stringDEV_26, stringDEV_27,stringDEV_28,stringDEV_29};
+            const char stringPAR_56[1] PROGMEM = "НАПРЯЖЕНИЕ АКБ ИБП"; // 35 counter_electricity_censor
+            const char stringPAR_57[1] PROGMEM = "";                    //57 сервис байт
+            const char stringPAR_58[1] PROGMEM = "";                    //58 сервис байт
+            const char stringPAR_59[1] PROGMEM = "";                    //59 сервис байт
 
 
-const char stringCOM_0[1]  PROGMEM = "БУЛЕВОЕ ВЫКЛ";
-const char stringCOM_1[1]  PROGMEM = "БУЛЕВОЕ ВКЛ";
-const char stringCOM_2[1]  PROGMEM = "БУЛЕВОЕ ИНВЕРТИРОВАТЬ";  
-const char stringCOM_3[1]  PROGMEM = "ЗНАЧЕНИЕ ДИММЕРА УСТАНОВИТЬ"; 
-const char stringCOM_4[1]  PROGMEM = "ЗНАЧЕНИЕ ДИММЕРА УМЕНЬШИТЬ";
-const char stringCOM_5[1]  PROGMEM = "ЗНАЧЕНИЕ ДИММЕРА УВЕЛИЧИТЬ";    
-const char stringCOM_6[1]  PROGMEM = "ИМПУЛЬСНОЕ ВКЛ";
-const char stringCOM_7[1]  PROGMEM = "ИМПУЛЬСНОЕ ВЫКЛ"; 
-const char stringCOM_8[1]  PROGMEM = "ИМПУЛЬСНОЕ ИНВЕРТИРОВАТЬ"; 
-const char stringCOM_9[1]  PROGMEM = "ЗНАЧЕНИЕ PWM УСТАНОВИТЬ"; 
-const char stringCOM_10[1]  PROGMEM = "ЗНАЧЕНИЕ PWM УМЕНЬШИТЬ";
-const char stringCOM_11[1]  PROGMEM = "ЗНАЧЕНИЕ PWM УВЕЛИЧИТЬ"; 
-const char stringCOM_12[1]  PROGMEM = "УСТАНОВИТЬ ЗНАЧЕНИЕ ПАРАМЕТРА"; 
+            const char* const string_tablePAR[60] PROGMEM = {stringPAR_0, stringPAR_1, stringPAR_2, stringPAR_3, stringPAR_4,   // здесь массив строк отчетов
+            stringPAR_5,  stringPAR_6,  stringPAR_7,  stringPAR_8,  stringPAR_9, stringPAR_10,stringPAR_11,stringPAR_12,stringPAR_13, 
+            stringPAR_14, stringPAR_15, stringPAR_16, stringPAR_17, stringPAR_18,stringPAR_19,stringPAR_20,stringPAR_21,stringPAR_22, 
+            stringPAR_23, stringPAR_24, stringPAR_25, stringPAR_26, stringPAR_27,stringPAR_28,stringPAR_29,stringPAR_30,stringPAR_31,
+            stringPAR_32, stringPAR_33, stringPAR_34, stringPAR_35, stringPAR_36,stringPAR_37,stringPAR_38,stringPAR_39,stringPAR_40,
+            stringPAR_41, stringPAR_42, stringPAR_43, stringPAR_44, stringPAR_45,stringPAR_46,stringPAR_47,stringPAR_48,stringPAR_49,
+            stringPAR_50, stringPAR_51, stringPAR_52, stringPAR_53, stringPAR_54,stringPAR_55,stringPAR_56,stringPAR_57,stringPAR_58,
+            stringPAR_59};
+
+            const char stringDEV_0[1] PROGMEM = "NULL DEVICE";
+            const char stringDEV_1[1] PROGMEM = "ЛАМПА НА ПОТОЛКЕ БУЛЕВАЯ"; //64 lamp_ceiling_onoff_device
+            const char stringDEV_2[1] PROGMEM = "ЛАМПА НАСТЕННАЯ БУЛЕВАЯ"; //65 lamp_wall_onoff_device
+            const char stringDEV_3[1] PROGMEM = "ЛАМПА ПОДСВЕТКИ БУЛЕВАЯ"; //66 lamp_Illumination_onoff_PARice
+            const char stringDEV_4[1] PROGMEM = "ЛАМПА АВАРИЙНАЯ БУЛЕВАЯ"; //67 lamp_accident_onoff_device
+            const char stringDEV_5[1] PROGMEM = "ЛАМПА НА ПОТОЛКЕ ДИММЕР"; //68 lamp_ceiling_dimm_device
+            const char stringDEV_6[1] PROGMEM = "ЛАМПА НА СТЕНЕ ДИММЕР"; //69 lamp_wall_dimm_device 
+            const char stringDEV_7[1] PROGMEM = "ЛАМПА ПОДСВЕТКИ ДИММЕР"; //70 lamp_Illumination_dimm_device
+            const char stringDEV_8[1] PROGMEM = "ЛАМПА АВАРИЙНАЯ ДИММЕР"; //71 lamp_accident_dimm_device
+            const char stringDEV_9[1] PROGMEM = "ВЕНТИЛЯТОР"; // 72 fan 
+            const char stringDEV_10[1] PROGMEM = "РЕКУПЕРАТОР";//73 recuperator
+            const char stringDEV_11[1] PROGMEM = "КОНДИЦИОНЕР"; // 74 air_conditioning 
+            const char stringDEV_12[1] PROGMEM = "КЛАПАН РАДИАТОРА ОТОПЛЕНИЯ"; // 75 valve_radiator
+            const char stringDEV_13[1] PROGMEM = "ЖАЛЮЗИ"        ; // 76 jalousie
+            const char stringDEV_14[1] PROGMEM = "КРАН ГАЗА"      ; // 77 valve_gas 
+            const char stringDEV_15[1] PROGMEM = "КРАН ГОРЯЧЕЙ ВОДЫ"  ; // 78 valve_hot_water
+            const char stringDEV_16[1] PROGMEM = "КРАН ХОЛОДНОЙ ВОДЫ"   ; //79 valve_cold_water
+            const char stringDEV_17[1] PROGMEM = "ИК ПРИЕМОПЕРЕДАТЧИК IRDA"               ; // 80 irda
+            const char stringDEV_18[1] PROGMEM = "ОСВЕЖИТЕЛЬ ВОЗДУХА"            ; // 81 freshener
+            const char stringDEV_19[1] PROGMEM = "УВЛАЖНИТЕЛЬ ВОЗДУХА"           ; // 82 humidifier 
+            const char stringDEV_20[1] PROGMEM = "ЗАМОК ДВЕРИ МАГНИТНЫЙ"      ; // 83 door_lock_magnet
+            const char stringDEV_21[1] PROGMEM = "ЗАМОК ДВЕРИ ЭЛЕКТРОМАГНИТНЫЙ"     ; //84 door_lock_electromagnet 
+            const char stringDEV_22[1] PROGMEM = "ЗАМОК ДВЕРИ ЭЛЕКТРОМЕХАНИЧЕСКИЙ"     ;  //85 door_lock_electromechanical
+            const char stringDEV_23[1] PROGMEM = "ЗАМОК ДВЕРИ BLINK"        ; // 86  door_lock_blink 
+            const char stringDEV_24[1] PROGMEM = "СИРЕНА"                  ; // 87 siren
+            const char stringDEV_25[1] PROGMEM = "СТРОБОСКОП МИГАЛКА";  // 88 blinker 
+            const char stringDEV_26[1] PROGMEM = "МУЗЫКА";  // 89 music
+            const char stringDEV_27[1] PROGMEM = "ТВ"; // 90 tv
+            const char stringDEV_28[1] PROGMEM = "РАДИО"; // 91 radio 
+            const char stringDEV_29[1] PROGMEM = "РОЗЕТКА";  // 92 power_socket 
+
+            const char* const string_tableDEV[30] PROGMEM = {stringDEV_0, stringDEV_1, stringDEV_2, stringDEV_3, stringDEV_4,   // здесь массив строк отчетов
+            stringDEV_5,  stringDEV_6,  stringDEV_7,  stringDEV_8,  stringDEV_9, stringDEV_10,stringDEV_11,stringDEV_12,stringDEV_13, 
+            stringDEV_14, stringDEV_15, stringDEV_16, stringDEV_17, stringDEV_18,stringDEV_19,stringDEV_20,stringDEV_21,stringDEV_22, 
+            stringDEV_23, stringDEV_24, stringDEV_25, stringDEV_26, stringDEV_27,stringDEV_28,stringDEV_29};
 
 
-const char* const string_tableCOM[13] PROGMEM = {stringCOM_0, stringCOM_1, 
-stringCOM_2, stringCOM_3, stringCOM_4,  stringCOM_5, stringCOM_6,
-stringCOM_7, stringCOM_8, stringCOM_9, stringCOM_10, stringCOM_11, stringCOM_12};            
+            const char stringCOM_0[1]  PROGMEM = "БУЛЕВОЕ ВЫКЛ";
+            const char stringCOM_1[1]  PROGMEM = "БУЛЕВОЕ ВКЛ";
+            const char stringCOM_2[1]  PROGMEM = "БУЛЕВОЕ ИНВЕРТИРОВАТЬ";  
+            const char stringCOM_3[1]  PROGMEM = "ЗНАЧЕНИЕ ДИММЕРА УСТАНОВИТЬ"; 
+            const char stringCOM_4[1]  PROGMEM = "ЗНАЧЕНИЕ ДИММЕРА УМЕНЬШИТЬ";
+            const char stringCOM_5[1]  PROGMEM = "ЗНАЧЕНИЕ ДИММЕРА УВЕЛИЧИТЬ";    
+            const char stringCOM_6[1]  PROGMEM = "ИМПУЛЬСНОЕ ВКЛ";
+            const char stringCOM_7[1]  PROGMEM = "ИМПУЛЬСНОЕ ВЫКЛ"; 
+            const char stringCOM_8[1]  PROGMEM = "ИМПУЛЬСНОЕ ИНВЕРТИРОВАТЬ"; 
+            const char stringCOM_9[1]  PROGMEM = "ЗНАЧЕНИЕ PWM УСТАНОВИТЬ"; 
+            const char stringCOM_10[1]  PROGMEM = "ЗНАЧЕНИЕ PWM УМЕНЬШИТЬ";
+            const char stringCOM_11[1]  PROGMEM = "ЗНАЧЕНИЕ PWM УВЕЛИЧИТЬ"; 
+            const char stringCOM_12[1]  PROGMEM = "УСТАНОВИТЬ ЗНАЧЕНИЕ ПАРАМЕТРА"; 
+
+
+            const char* const string_tableCOM[13] PROGMEM = {stringCOM_0, stringCOM_1, 
+            stringCOM_2, stringCOM_3, stringCOM_4,  stringCOM_5, stringCOM_6,
+            stringCOM_7, stringCOM_8, stringCOM_9, stringCOM_10, stringCOM_11, stringCOM_12};            
             
 #endif //debug
            
@@ -723,17 +714,19 @@ stringCOM_7, stringCOM_8, stringCOM_9, stringCOM_10, stringCOM_11, stringCOM_12}
 
 //ФУНКЦИИ SEND
             void SendCommand(bool Priority, byte Command_Type, byte Command_Value, byte Command_Value_2, byte Command_Value_3, byte Command_Value_4, byte Target_Address,  byte Device_Type, byte Sensor_numb);
+            void test ();
             void SendCommand_queue();
             void StatusTX (byte addr);
             //void SendAccident (byte AlarmAddr);
             void DataStreamSend();
-            void SendRequestParam (bool Priority, byte Target_Address,  byte Param_Type, const size_t siZE, byte *Sensor_numb);         
+            //void SendRequestParam (bool Priority, byte Target_Address,  byte Param_Type, const size_t siZE, byte *Sensor_numb);         
 
 //ФУНКЦИИ SYSTEM
             void pinmode(); // настройка портов (в зависимости от конфигурации массива device)
             byte timeout(byte dev_Type);
             byte param_addr (byte AdDr, byte SensNum);
             byte device_addr (byte AdDr);
+      
             
 //Для DEBUG NODE
 #ifdef debug
