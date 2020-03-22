@@ -625,8 +625,8 @@ byte AHB::ahbSend(uint8_t type, uint8_t cmd, uint8_t target, uint8_t port, uint8
             if (target==_busAddr[busId]->address_network_get(0)){
                 broadcast_route=true;
                 #ifdef AHB_DEBUG
-                Serial.print(F("TX Route target -  "));Serial.print(target);Serial.print(F(" to Bus - "));
-                Serial.print(busId);  Serial.print(F(" Form source - "));Serial.println(source);
+                  Serial.print(F("TX Route target -  "));Serial.print(target);Serial.print(F(" to Bus - "));
+                  Serial.print(busId);  Serial.print(F(" Form source - "));Serial.println(source);
                 #endif //AHB_DEBUG
                 //Отправка в шину busId
                 state = _busAddr[busId]->ahbSend_V(type, cmd, target,  port, source, len, data);
@@ -639,8 +639,10 @@ byte AHB::ahbSend(uint8_t type, uint8_t cmd, uint8_t target, uint8_t port, uint8
             for (int i=0; i<_busAddr[busId]->net_size_get();i++){
               //Если получатель в сети 
               if (target==_busAddr[busId]->address_network_get(i)&&_busAddr[busId]->address_network_get(i)!=0){
-               Serial.print(F("Target ")); Serial.print(target); Serial.print(F(" locate to bus ")); Serial.println(busId);
-              busId_route=busId;
+                #ifdef AHB_DEBUG
+                  Serial.print(F("Target ")); Serial.print(target); Serial.print(F(" locate to bus ")); Serial.println(busId);
+                #endif //AHB_DEBUG
+                busId_route=busId;
               }
             }
           }
@@ -648,10 +650,10 @@ byte AHB::ahbSend(uint8_t type, uint8_t cmd, uint8_t target, uint8_t port, uint8
         
         if(busId_route!=-1){
           if(_busAddr[busId_route] != 0x00){
-             //#ifdef AHB_DEBUG
-             Serial.print(F("TX Route target - "));Serial.print(target);Serial.print(F(" to Bus - "));
-             Serial.print(busId_route); Serial.print(F(" Form source - "));Serial.println(source);
-             //#endif //AHB_DEBUG
+             #ifdef AHB_DEBUG
+              Serial.print(F("TX Route target - "));Serial.print(target);Serial.print(F(" to Bus - "));
+              Serial.print(busId_route); Serial.print(F(" Form source - "));Serial.println(source);
+             #endif //AHB_DEBUG
              //Отправка в шину busId_route
              state = _busAddr[busId_route]->ahbSend_V(type, cmd, target,  port, source, len, data);
              
@@ -1074,7 +1076,9 @@ void AHB::ahbRxProcessingCMD(ahbPacket &pkg){
                  }
                  
                  //PrintSystemUpTime();  PrintSystemHwTime(); 
-               Serial.print(F("Receive HEARTBEAT from node - ")); Serial.println(pkg.meta.source);
+                 
+               //Serial.print(F("Receive HEARTBEAT from node - ")); Serial.println(pkg.meta.source);
+                 
                  //ahbCAN_pintError(busId);
                  
                  //status_send=ahbAddSendMsgQueue(AHB_PKGTYPE_UNICAST, AHB_CMD_F_NMT_PONG, pkg.meta.source, pkg.meta.port, _nodeId, sizeof(data), data, pkg.meta.busId);
@@ -1090,7 +1094,7 @@ void AHB::ahbRxProcessingCMD(ahbPacket &pkg){
                 _master->ut_rn[pkg.meta.source][3]=pkg.data[3];
                 _master->ut_rn[pkg.meta.source][4]=pkg.data[4];
                 _master->ut_rn[pkg.meta.source][5]=pkg.data[5];
-                Serial.print(F("Receive HEARTBEAT from Node - ")); Serial.println(pkg.meta.source);    
+                //Serial.print(F("Receive HEARTBEAT from Node - ")); Serial.println(pkg.meta.source);    
               }
               
               if (_nodeType==Slave){
@@ -1104,7 +1108,7 @@ void AHB::ahbRxProcessingCMD(ahbPacket &pkg){
                  _slave->ut_rn[pkg.meta.source][3]=pkg.data[3];
                  _slave->ut_rn[pkg.meta.source][4]=pkg.data[4];
                  _slave->ut_rn[pkg.meta.source][5]=pkg.data[5];
-                Serial.print(F("Receive HEARTBEAT from Node - ")); Serial.println(pkg.meta.source); 
+                 //Serial.print(F("Receive HEARTBEAT from Node - ")); Serial.println(pkg.meta.source); 
                 } 
                 else
                  { //Если от мастера устанавливаем время
@@ -1338,10 +1342,10 @@ void AHB::ahbHeartbeat(uint8_t bus_Type){
          /////state = ahbAddSendMsgQueue(0, CMD, 0, 0, _nodeId, sizeof(data),data , busId); 
          state = _busAddr[busId]->ahbSend_V(0, CMD, 0,  0, _nodeId, sizeof(data), data);
          ahbCAN_pintError(busId);
-         //#ifdef AHB_DEBUG
+         #ifdef AHB_DEBUG
           Serial.print(F("Generate Heartbeat Node - ")); Serial.print(_nodeId); 
           Serial.print(F(" / TX status - ")); Serial.println(state);    
-         //#endif ///AHB_DEBUG
+         #endif ///AHB_DEBUG
         }    
       }
     }
