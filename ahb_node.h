@@ -740,6 +740,7 @@ stringCOM_7, stringCOM_8, stringCOM_9, stringCOM_10, stringCOM_11, stringCOM_12}
             byte ExecutionResult (byte dev_Type, byte Command_Type, byte Command_Value);
 
 //ФУНКЦИИ RX TX
+            void AHB_NODE::RX_PROC_NODE_COMMAND(ahbPacket &pkg);
             void RX();
             void TX(bool priority, uint8_t msg_type, uint8_t target_addr, uint8_t dev_type, bool can_ID_type, bool can_frame_type, uint8_t DLC,  byte data[8]);
 
