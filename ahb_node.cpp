@@ -25,14 +25,16 @@ void AHB_NODE::WTD_node(unsigned long millis_){
           Serial.println(F("No receive Heartbeat from all, reboot node"));
            while(1){}
         }
-
+        
 }
 
 bool AHB_NODE::nodeBusAttach(AHB *node_bus) {
         _ahb = node_bus;
         Serial.println(F("nodeBusAttach"));
-        timeoutsConfigControl();
-        parametersConfigControl();
+        #ifdef debug
+          timeoutsConfigControl();
+          parametersConfigControl();
+        #endif //debug
         pinmode();                  // настройка портов (в зависимости от конфигурации массива device)
         return true;
 }
@@ -621,6 +623,7 @@ void AHB_NODE::TX_COMMAND(bool priority, uint8_t msg_type, uint8_t target_addr, 
         // тип FRAME  0 - DATA;     1 - REMOTE FRAME
 } 
 
+
 void AHB_NODE::SendCommand(bool Priority, byte Command_Type, byte Command_Value, byte Command_Value_2, byte Command_Value_3, byte Command_Value_4, byte Target_Address,  byte Device_Type, byte Sensor_numb){
         bool empty_cells = 0; // наличие свободной ячейки в очереди
         Command_COUNTER++;
@@ -646,6 +649,20 @@ void AHB_NODE::SendCommand(bool Priority, byte Command_Type, byte Command_Value,
           if (!empty_cells) Serial.println (F("Внимание!!! отсутствует свободная ячейка в очереди на отправку CAN сообщения. Сообщение НЕ отправлено!!!"));
         #endif  
         //------------------------------------------  
+}
+
+void AHB_NODE::test (){
+        if (Serial.available()>0){
+          byte inByte;
+          inByte = Serial.read () - '0';
+            if      (inByte == 1) SendCommand (1, PWM_TURN_ON,     20, 0,0,0, node_19_Livingroom_main, lamp_wall_onoff_d , 1);
+            else if (inByte == 0) SendCommand (1, PWM_TURN_OFF,    20, 0,0,0, node_19_Livingroom_main, lamp_wall_onoff_d , 1);
+            else if (inByte == 2) SendCommand (1, DIGITAL_REMOTE,   1, 0,0,0, node_19_Livingroom_main, lamp_ceil_onoff_d , 1);
+            else if (inByte == 3) SendCommand (1, DIGITAL_REMOTE,   0, 0,0,0, node_19_Livingroom_main, lamp_ceil_onoff_d , 1), Serial.println("TRI");
+            else if (inByte == 4) device [device_addr (lamp_ceiling_dimm_d)][DEVICE_VALUE] = 0;
+            else if (inByte == 5) SendCommand (1, PARAMETER_WRITE, 45, 0,0,0, node_19_Livingroom_main, air_t, 1);
+            //else if (inByte == 9) MCP2515_Init ();
+        }
 }
 
 void AHB_NODE::SendCommand_queue(){
@@ -742,8 +759,6 @@ void AHB_NODE::SendAccident (byte AlarmAddr) {
 #endif
 */
 
-
-//#if defined (type_node_slave) or defined (type_node_mk) 
 void AHB_NODE::DataStreamSend(){
         bool Periodical_timer = 0;  
         // if (curMillis - timerPeriodSendParameters > (uint32_t)interval_sendParam *1500ul) {Periodical_timer = 1; timerPeriodSendParameters = curMillis; }
@@ -788,8 +803,9 @@ void AHB_NODE::DataStreamSend(){
           } 
         } 
 }
-//#endif  
 
+/**
+//Пока не используется
 void AHB_NODE::SendRequestParam (bool Priority, byte Target_Address,  byte Param_Type, const size_t siZE, byte *Sensor_numb) {
         byte sensors_quantity;
         if (siZE<8) sensors_quantity = siZE; else sensors_quantity = 7;
@@ -799,6 +815,7 @@ void AHB_NODE::SendRequestParam (bool Priority, byte Target_Address,  byte Param
         for (byte i = 1 ; i<sensors_quantity+1; i++) daTa [i] = Sensor_numb[i-1];
         TX_COMMAND(Priority, PARAMETER_REQUEST, Target_Address, Param_Type, BIT_29, DATA_CANFRAME, sizeof(daTa), daTa);
 }
+*/
 
 //ниже функция конфигурирования портов ардуино , в случае укомплетованности узла тем или иным устройством и факта подсоединения к пину ардуино
 void AHB_NODE::pinmode() {
