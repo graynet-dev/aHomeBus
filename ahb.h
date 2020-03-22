@@ -161,7 +161,6 @@ typedef enum enum_nodeType {
      * own functions to various messages
      */    
 
-//void ahb_RXInt(void);
 class AHB_NODE;
 class AHB_NODE2;
 //class AHB_SLAVE;
@@ -287,7 +286,6 @@ class AHB {
             /**
             * Watch dog 1 enable/ 0 disable
             */            
-            bool WTD_set(bool set_wdt); 
             
             signed char busId_GW_CAN_TO_UDP = -1;
             
@@ -295,13 +293,9 @@ class AHB {
 
             
         public:
-            
+        
+            //Проверка таблицы статусов узлов
             bool NodeGuard_OK_check (uint8_t a, uint8_t b);
-
-            /*
-            Массив со статусами удаленных узлов. Заполняется на основе ответов
-            */
-            //bool NodeGuard_OK[255][3] = {{ 0 }}; //[2]
  
             /**
              * Node Type 
@@ -636,12 +630,12 @@ class AHB {
             /**
             Вывод состояния ответов узлов сети на PING
             */              
-            void ahbNodeGuard_print(void);
+            void ahbStatusNode_print(void);
 
             /**
-            Прием ответов на PING -> PONG и заполнение массива NodeGuard_OK[][]
+            Обработка базовых команд и вызовы коммандных процессоров Master, Slave, Node
             */              
-            void ahbRxProcessingNode(ahbPacket &pkg);
+            void ahbRxProcessingCMD(ahbPacket &pkg);
             
             /**
             Таймер?????
