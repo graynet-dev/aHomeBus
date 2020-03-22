@@ -177,7 +177,9 @@ class AHB_CAN : public AHB_COMM { // <net_size>
              * @param len number of bytes to send (0-8)
              * @param data array of bytes to send
              */
-            bool ahbSend_V(uint8_t type, uint8_t cmd, uint8_t target, uint8_t port, uint8_t source,  uint8_t len, byte data[8]);
+           //Тип передаваемого сообщения msg_type
+           //Тип устройства пр передаче управляющих команд для Node и команды сети dev_type
+            bool ahbSend_V(uint8_t type, uint8_t dev_type, uint8_t target, uint8_t msg_type, uint8_t source,  uint8_t len, byte data[8]);
             
             /**
              * Receive a message from the CAN-bus
