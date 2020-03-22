@@ -1551,6 +1551,8 @@ ahbPacket AHB::loop(void) {
         if (_nodeType==Node){   //Слейв
           ahbHeartbeat(type_CAN);
           _node->WTD_node(curMillis);
+          _node->SendCommand_queue(); //отправка очереди команд NODE
+          _node->test();
         }
         
         //ahbSendMsgQueue(); //Отправка очереди ahbSendMsgQueue()
