@@ -165,6 +165,30 @@ byte AHB_NODE::ExecutionResult (byte dev_Type, byte Command_Type, byte Command_V
         } 
 }
 
+void AHB_NODE::RX_PROC_NODE_COMMAND(ahbPacket &pkg){
+Serial.println("-----------------------------------");
+Serial.print("pkg.meta.priority - ");Serial.println(pkg.meta.priority);
+Serial.print("pkg.meta.msg_type - ");Serial.println(pkg.meta.msg_type);
+Serial.print("pkg.meta.source - ");Serial.println(pkg.meta.source);
+Serial.print("pkg.meta.target - ");Serial.println(pkg.meta.target);
+Serial.print("pkg.meta.dev_type - ");Serial.println(pkg.meta.dev_type);
+Serial.print("pkg.meta.cmd - ");Serial.println(pkg.meta.cmd);
+Serial.print("pkg.meta.type - ");Serial.println(pkg.meta.type);
+Serial.print("pkg.meta.port - ");Serial.println(pkg.meta.port);
+Serial.print("pkg.meta.busType - ");Serial.println(pkg.meta.busType);
+Serial.print("pkg.meta.busId - ");Serial.println(pkg.meta.busId);
+Serial.print("pkg.len - ");Serial.println(sizeof(pkg.data));
+Serial.print("pkg.data[0] - ");Serial.println(pkg.data[0]);
+Serial.print("pkg.data[1] - ");Serial.println(pkg.data[1]);
+Serial.print("pkg.data[2] - ");Serial.println(pkg.data[2]);
+Serial.print("pkg.data[3] - ");Serial.println(pkg.data[3]);
+Serial.print("pkg.data[4] - ");Serial.println(pkg.data[4]);
+Serial.print("pkg.data[5] - ");Serial.println(pkg.data[5]);
+Serial.print("pkg.data[6] - ");Serial.println(pkg.data[6]);
+Serial.print("pkg.data[7] - ");Serial.println(pkg.data[7]);
+Serial.println("-----------------------------------");
+}
+
 void AHB_NODE::RX(){
 /**        uint32_t rxId_can;
         byte len_can = 0;
