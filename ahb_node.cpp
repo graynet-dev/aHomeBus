@@ -7,12 +7,12 @@
     
 
 AHB_NODE::AHB_NODE(uint8_t id){
-  bme = new Adafruit_BME280();
+  //bme = new Adafruit_BME280();
 } 
 
 byte AHB_NODE::begin() {
   
-  bme.begin(0x76, &Wire);
+  //bme.begin(0x76, &Wire);
   //bme.begin(0x76, &Wire);
   //bme_temp->printSensorDetails();
   //bme_pressure->printSensorDetails();
@@ -58,6 +58,17 @@ void AHB_NODE::bme280_print(void) {
   Serial.print(pressure_event.pressure);
   Serial.println(" hPa");
 */
+    if (! bme.begin(0x76, &Wire))
+    {
+    Serial.println("BME ERROR");
+    }
+    else
+    {
+    Serial.println("BME OK");
+    }
+    
+    
+    
     bme.takeForcedMeasurement();
     Serial.print("Temperature = ");
     Serial.print(bme.readTemperature());
