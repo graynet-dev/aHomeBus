@@ -2,11 +2,22 @@
 //#define AHB_NODE_C
     
     #include "ahb_node.h"
+    #include <Wire.h>
+    #include <SPI.h>
     
 
 AHB_NODE::AHB_NODE(uint8_t id){
-
+  bme = new Adafruit_BME280();
 } 
+
+byte AHB_NODE::begin() {
+  
+  bme.begin(0x76, &Wire);
+  //bme.begin(0x76, &Wire);
+  //bme_temp->printSensorDetails();
+  //bme_pressure->printSensorDetails();
+  //bme_humidity->printSensorDetails();
+}
 
 void AHB_NODE::WTD_node(unsigned long millis_){
 
@@ -26,6 +37,47 @@ void AHB_NODE::WTD_node(unsigned long millis_){
            while(1){}
         }
         
+}
+
+void AHB_NODE::bme280_print(void) {
+/**
+  sensors_event_t temp_event, pressure_event, humidity_event;
+  bme_temp->getEvent(&temp_event);
+  bme_pressure->getEvent(&pressure_event);
+  bme_humidity->getEvent(&humidity_event);
+  
+  Serial.print(F("Temperature = "));
+  Serial.print(temp_event.temperature);
+  Serial.println(" *C");
+
+  Serial.print(F("Humidity = "));
+  Serial.print(humidity_event.relative_humidity);
+  Serial.println(" %");
+
+  Serial.print(F("Pressure = "));
+  Serial.print(pressure_event.pressure);
+  Serial.println(" hPa");
+*/
+    bme.takeForcedMeasurement();
+    Serial.print("Temperature = ");
+    Serial.print(bme.readTemperature());
+    Serial.println(" *C");
+
+    Serial.print("Pressure = ");
+
+    Serial.print(bme.readPressure() / 100.0F);
+    Serial.println(" hPa");
+
+    Serial.print("Approx. Altitude = ");
+    Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA));
+    Serial.println(" m");
+
+    Serial.print("Humidity = ");
+    Serial.print(bme.readHumidity());
+    Serial.println(" %");
+
+    Serial.println();
+  
 }
 
 bool AHB_NODE::nodeBusAttach(AHB *node_bus) {
