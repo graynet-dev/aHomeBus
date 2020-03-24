@@ -76,12 +76,12 @@ void AHB_NODE::bme280_print(void) {
 
     Serial.print("Pressure = ");
 
-    Serial.print(bme.readPressure() / 100.0F);
-    Serial.println(" hPa");
+    Serial.print(round((bme.readPressure() / 100.0F)* 0.75006375541921));
+    Serial.println(" mmHg");
 
-    Serial.print("Approx. Altitude = ");
-    Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA));
-    Serial.println(" m");
+    //Serial.print("Approx. Altitude = ");
+    //Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA));
+    //Serial.println(" m");
 
     Serial.print("Humidity = ");
     Serial.print(bme.readHumidity());
@@ -93,7 +93,7 @@ void AHB_NODE::bme280_print(void) {
 
 bool AHB_NODE::nodeBusAttach(AHB *node_bus) {
         _ahb = node_bus;
-        Serial.println(F("nodeBusAttach"));
+        //Serial.println(F("nodeBusAttach"));
         #ifdef debug
           timeoutsConfigControl();
           parametersConfigControl();
