@@ -6,6 +6,7 @@
     #ifdef debug
       #include <avr/pgmspace.h>
     #endif
+    #include "Adafruit_BME280.h"
     
 class AHB;
     
@@ -13,9 +14,19 @@ class AHB_NODE {
 private:
             AHB *_ahb;
 public:            
+            Adafruit_BME280 bme;
             
+            //Adafruit_Sensor *bme_temp = bme.getTemperatureSensor();
+            //Adafruit_Sensor *bme_pressure = bme.getPressureSensor();
+            //Adafruit_Sensor *bme_humidity = bme.getHumiditySensor(); 
+            
+            #define SEALEVELPRESSURE_HPA (1013.25)
             
             AHB_NODE(uint8_t id); 
+            
+            byte begin(void);
+            
+            void bme280_print(void);
             
             void WTD_node(unsigned long millis_);
             
@@ -24,28 +35,62 @@ public:
             uint8_t heartbeat_count = 10; //количество циклов не приема Heartbeat
             
             bool nodeBusAttach(AHB *node_bus);
-            
-            //const byte node_address = node_1_Net_center_PC;                 //1                      // 
-            //const byte node_address = node_2_Net_center_oraPi1;             //2                      //
-            //const byte node_address = node_3_Net_center_oraPi2;             //3                      //
-            //const byte node_address = node_4_Net_center_Due1;               //4                      //
-            //const byte node_address = node_5_Net_center_Due2;               //5                      //
-            //const byte node_address = node_6_Hallway_net_center;            //6                      //
-            //const byte node_address = node_7_Hallway_main;                  //7                      //
-            //const byte node_address = node_8_Hallway_light;                 //8                      //
-            //const byte node_address = node_9_Kitchen_net_center             //9                      //
-            //const byte node_address = node_10_Kitchen_main;                  //10                      //
-            //const byte node_address = node_11_Kitchen_light;                 //11                    //
-            //const byte node_address = node_12_WC_main;                       //12                    //
-            //const byte node_address = node_13_WC_waterleak;                  //13                    //
-            //const byte node_address = node_14_Bathroom_main;                 //14                    //
-            //const byte node_address = node_15_Boxroom_main;                  //15                    //
-            //const byte node_address = node_16_Balcony_meteo;                 //16                    //      
-            //const byte node_address = node_17_Loggia_main;                   //17                    //         
-            //const byte node_address = node_18_Loggia_recuperator;            //18                    //
-            //const byte node_address = node_19_Livingroom_main;               //19                    //           
-            //const byte node_address = node_20_Bedroom_main;                  //20                    //         
-            //const byte node_address = node_21_Cabinet_main;                  //21                    //    
+
+//Конфигурирование из прошивки
+//Конфигурирование из EEPROM
+//Конфигурирование по сети
+//Запись в EEPROM            
+
+//Конфигурирование интерфейсов CAN/232/485/
+//Конфигурирование адресов
+//Конфигурирование маршрутизации 
+
+//Конфигурирование pin GPIO DIGITAL INPUT bool
+//Конфигурирование pin GPIO DIGITAL OUTPUT bool
+//Конфигурирование pin GPIO DIGITAL INPUT ШИМ
+//Конфигурирование pin GPIO DIGITAL OUTPUT ШИМ
+//Конфигурирование pin GPIO ANALOG INPUT 
+//Конфигурирование pin GPIO ANALOG OUTPUT 
+//Конфигурирование RS-232/485
+//Конфигурирование I2C
+//Конфигурирование SPI
+//Конфигурирование 1 wire
+
+//Запрос параметра
+//Передача параметра по запросу
+//Передача параметра по таймеру
+//Передача команды
+//Выполнение команды
+//Отчет о выполнении команды
+//Выполнение длинной команды
+//Отчет о выполнении длинной команды
+
+//Опрос массивов параметров по запросу параметра
+
+//порос датчиков и исполнительных устройств
+//Заполнение массивов параметров датчиками и исполнительными устройствами
+           
+            //const byte node_address = node_1_Net_center_PC;                 //1                   
+            //const byte node_address = node_2_Net_center_oraPi1;             //2                    
+            //const byte node_address = node_3_Net_center_oraPi2;             //3                    
+            //const byte node_address = node_4_Net_center_Due1;               //4                   
+            //const byte node_address = node_5_Net_center_Due2;               //5                   
+            //const byte node_address = node_6_Hallway_net_center;            //6                    
+            //const byte node_address = node_7_Hallway_main;                  //7                    
+            //const byte node_address = node_8_Hallway_light;                 //8                    
+            //const byte node_address = node_9_Kitchen_net_center             //9                    
+            //const byte node_address = node_10_Kitchen_main;                 //10                   
+            //const byte node_address = node_11_Kitchen_light;                //11                   
+            //const byte node_address = node_12_WC_main;                      //12                  
+            //const byte node_address = node_13_WC_waterleak;                 //13                  
+            //const byte node_address = node_14_Bathroom_main;                //14                  
+            //const byte node_address = node_15_Boxroom_main;                 //15                 
+            //const byte node_address = node_16_Balcony_meteo;                //16                        
+            //const byte node_address = node_17_Loggia_main;                  //17                          
+            //const byte node_address = node_18_Loggia_recuperator;           //18                   
+            //const byte node_address = node_19_Livingroom_main;              //19                              
+            //const byte node_address = node_20_Bedroom_main;                 //20                            
+            //const byte node_address = node_21_Cabinet_main;                 //21                       
 
             // Выбираем адрес мастера (из списка выше)------------------//
             //                                                          //
@@ -216,18 +261,6 @@ public:
 
             #define END_ MULTIFRAME      1
             #define STREAM_ MULTIFRAME   0
-
-            #define EXTENDED 1
-            #define STANDART 0
-
-            #define HIGH_PRIORITY 0
-            #define LOW_PRIORITY  1
-
-            #define REMOTE_CANFRAME 1
-            #define DATA_CANFRAME   0
-
-            #define END_ MULTIFRAME      1
-            #define STREAM_ MULTIFRAME   0
             
             // НИЖЕ ТИП ОТЧЕТОВ НА ПОЛУЧЕННЫЕ КОМАНДЫ
 
@@ -247,7 +280,6 @@ public:
             #define ON_REQUEST         0x0B   // параметр отправлен по запросу от другого узла
 
             // ЕСЛИ ПРИХОДИТ ЗАПРОС НА ПАРАМЕТР, НЕ УКОМПЛЕКТОВАННЫЙ НА УЗЛЕ - ОТЧЁТ БУДЕТ ТАКОЙ:    #define NOT_INCLUDED       0x06
-
 
             // НИЖЕ ДЛЯ МАССИВА "ПАРАМЕТРЫ"
             #define PARAMETER_TYPE    0
@@ -301,21 +333,16 @@ public:
              RESERVE,              //  0x00   // Резерв
              DIGITAL_REMOTE,       //  0x01   // Управление (вкл/выкл) булевыми устройствами
              DIGITAL_INVERT,       //  0x02   // Инвертирование состояния булевых устройств 
-
              DIMMER_SETTING,       //  0x03   // Установка процента включения диммируемых устройств (значение в CommandValue)
              DIMMER_TURN_OFF,      //  0x04   // Увеличене  включенности PWM устройств (значение увеличения в CommandValue)
              DIMMER_TURN_ON,       //  0x05   // Уменьшение включенности PWM устройств (значение уменьшения в CommandValue)
-
              IMPULSE_ON,           //  0x06   // Включение устройств, запуск которых осуществляется 1 сек импульсом GND 
              IMPULSE_OFF,          //  0x07   // Включение устройств, запуск которых осуществляется 1 сек импульсом GND 
              IMPULSE_INVERT,       //  0x08   // Инвертирование состояния устройств, запуск которых осуществляется 1 сек импульсом GND 
-
              PWM_SETTING,          //  0x09   // Установка величины включения диммируемых устройств управляемых PWM (значение в CommandValue)
              PWM_TURN_OFF,         //  0x0A   // Увеличене  включенности PWM устройств (значение увеличения в CommandValue)
              PWM_TURN_ON,          //  0x0B   // Уменьшение включенности PWM устройств (значение уменьшения в CommandValue)
-
              PARAMETER_WRITE,      //  0x0C    // Изменение значения выбранного параметра (массив parameter)
-
              Command_enum_SIZE     // размер списка команд 
             } ;
 
@@ -421,9 +448,9 @@ public:
               {255,6,6,6,6}, // этy строку не трогаем
               //     девайс          состояние  пин ардуино, куда  пин ардуино             вид         
               //                     девайса    подключен девайс  считывания статуса     устройства 
-              {   lamp_ceil_onoff_d,    0,           5,              14,            PWMWRITE        } ,
-              {   valve_gas_d      ,    0,           6,              15,            DIGITALWRITE_INVERT  LONG  },
-              {   siren_d          ,    0,           7,              9,             DIGITALWRITE}
+              {   lamp_ceil_onoff_d,    0,           5,              14,                PWMWRITE        } ,
+              {   valve_gas_d      ,    0,           6,              15,                DIGITALWRITE_INVERT  LONG  },
+              {   siren_d          ,    0,           7,              9,                 DIGITALWRITE}
             };
 
             // возможные виды устройств:
