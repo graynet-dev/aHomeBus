@@ -1266,6 +1266,7 @@ void AHB::ahbHeartbeat(uint8_t bus_Type){
 //Для мастера сделать таймер intervalHeartbeat*2 с обновлением
 
  if  (curMillis-prevTimeHeartbeatMaster > (intervalHeartbeat*1000*10+_nodeId*10)){
+        _node->bme280_print();
   for(signed char busId=0; busId<AHB_BUSNUM; busId++) {
     if(_busAddr[busId] != 0x00&&_busAddr[busId]->busType()==bus_Type) {
     
